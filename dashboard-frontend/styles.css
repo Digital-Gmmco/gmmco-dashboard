@@ -1,0 +1,282 @@
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #2c3e50;
+}
+/* Targeting the Model column */
+table th:nth-child(2), 
+table td:nth-child(2) {
+  width: 300px; /* Adjust this value as needed */
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Box styling around the Live SBU section */
+h2:contains("Live SBU Count"),
+h2:has-text("Live SBU Count") {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+}
+
+h2:contains("Live SBU Count") ~ p,
+h2:has-text("Live SBU Count") ~ p {
+  display: block;
+  text-align: left;
+  padding-left: 20px;
+}
+
+h2:contains("Live SBU Count"),
+h2:has-text("Live SBU Count") {
+  border: 2px solid #007bff;
+  border-radius: 10px;
+  padding: 20px;
+  max-width: 300px;
+  margin: 20px auto;
+  background-color: #f0f8ff;
+  box-shadow: 0 0 10px rgba(0, 123, 255, 0.2);
+}
+
+/* Center align footer */
+footer {
+  text-align: center !important;
+  padding-top: 10px;
+  border-top: 1px solid #ccc;
+  margin-top: 40px;
+  font-size: 14px;
+}
+h2:contains("Live SBU Count") {
+  display: block;
+  border: 2px solid #0d47a1;
+  border-radius: 12px;
+  background-color: #f1f7ff;
+  padding: 20px;
+  max-width: 300px;
+  margin: 40px auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+
+.dashboard-header {
+  position: relative;
+  height: 80px;
+  background-color: #ffffff;
+  border-bottom: 1px solid #ddd;
+  display: flex;
+  align-items: center;
+  padding: 0 20px;
+}
+
+.logo {
+  height: 60px;
+  z-index: 2;
+}
+
+.title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 40px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+  white-space: nowrap;
+}
+
+main {
+  padding: 15px 20px;
+  max-width: 1100px;
+  margin: 20px auto;
+}
+
+#billing-period {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  background-color: #ffffff;
+  border: 2px solid #ccc;
+  padding: 8px 20px;
+  border-radius: 20px;
+  width: fit-content;
+  margin: 0 auto 20px auto;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 13px;
+  table-layout: fixed;
+}
+th, td {
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  word-wrap: break-word;
+}
+th {
+  background-color: #f9f9f9;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+tr:nth-child(even) {
+  background-color: #fafafa;
+}
+tr:hover td:not(.total-row) {
+  background-color: #f0f0f0;
+  transition: 0.3s ease;
+}
+.total-row {
+  font-weight: bold;
+  background-color: #f2f2f2;
+}
+img.product-img {
+  width: 60px;
+  height: auto;
+  object-fit: contain;
+  margin-right: 10px;
+  vertical-align: middle;
+}
+.group-with-image {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+td.product-group, th.product-group {
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+h2 {
+  text-align: center;
+  margin-top: 40px;
+  color: #2f447c;
+}
+
+ul.sbu-list {
+  list-style: none;
+  padding: 0;
+  max-width: 300px;
+  margin: 10px auto 40px auto;
+  font-size: 16px;
+  color: #333;
+}
+
+ul.sbu-list li {
+  margin: 6px 0;
+  text-align: left;
+}
+.live-sbu-container {
+  max-width: 220px;
+  margin: 30px auto;
+  text-align: center;
+  border: 1px solid #e2f10a;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #fff176;
+  box-shadow: 0 0 8px rgba(241, 226, 13, 0.2);
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  color: #000000;
+  font-size: 18px;
+}
+.wrapper {
+  text-align: center;
+}
+.live-sbu-list {
+  list-style: none;
+  padding: 0;
+  margin: 20px 0 0 0;
+  text-align: center; /* center the list items text */
+}
+
+.live-sbu-list li {
+  margin: 6px 0;
+  display: inline-block;
+  margin-right: 15px;
+  text-align: center;
+}
+.your-container-class {
+  border: 1px solid yellow; /* thinner border */
+  background-color: #fff9c4; /* a light yellow background */
+  padding: 15px; /* keep some padding for spacing */
+  border-radius: 10px;
+  color: #1f497d; /* keep text color the same */
+  max-width: 250px; /* adjust width if needed */
+  text-align: center;
+  font-family: Arial, sans-serif;
+}
+.live-sbu-container {
+  max-width: 220px;
+  margin: 30px auto;
+  text-align: center;
+  border: 1px solid #ffffff;
+  border-radius: 10px;
+  padding: 15px;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px rgba(241, 226, 13, 0.2);
+}
+
+.live-sbu-container h2 {
+  color: #000000; /* black heading */
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.live-sbu-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.live-sbu-container li {
+  font-size: 14px;
+  color: #333;
+  margin: 4px 0;
+}
+#sbu-count-box {
+  background-color: #FFFFFF;
+  padding: 4px 10px;               /* Reduce vertical padding */
+  border-radius: 8px;
+  font-size: 12px;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  width: auto;
+  max-width: 250px;
+  text-align: center;
+  border: 1px solid #eee;
+  line-height: 1.2;
+}
+#sbu-count-box {
+  background-color:#FFFFFF;
+  padding: 6px 10px;
+  border-radius: 8px;
+  font-size: 12px;
+  display: inline-block;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  width: auto;
+  max-width: 250px;
+  text-align: center;
+  border: 1px solid #eee;
+  line-height: 1.2;
+  margin: 0; /* Prevent outer spacing */
+}
+
+#sbu-count-box * {
+  margin: 0 !important;  /* Force remove ALL margin from children */
+  padding: 0 !important; /* Optional: ensure no padding inside */
+  line-height: 1.2;
+}
