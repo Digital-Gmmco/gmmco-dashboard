@@ -15,12 +15,24 @@
 
     body {
       font-family: "Segoe UI", sans-serif;
-          background: url('./images/loginpage.png') no-repeat center center fixed;
+      background: url('./images/loginpage.png') no-repeat center center fixed;
       background-size: cover;
       height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
+      position: relative;
+    }
+
+    .logo-top-left {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .logo-top-left img {
+      height: 50px;
+      width: auto;
     }
 
     .login-card {
@@ -68,6 +80,11 @@
   </style>
 </head>
 <body>
+  <!-- Logo in the top-left corner -->
+  <div class="logo-top-left">
+    <img src="images/gmmco-logo.png" alt="GMMCO Logo">
+  </div>
+
   <div class="login-card">
     <h2>GMMCO CI Dashboard Login</h2>
     <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
