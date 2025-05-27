@@ -91,7 +91,7 @@
         const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
         localStorage.setItem("gmmcoLoggedIn", "true");
         localStorage.setItem("gmmcoEmail", loginResponse.account.username);
-        window.location.href = "gmmco-dashboard/index.html";
+        window.location.href = "/gmmco-dashboard/index.html";
       } catch (error) {
         console.error(error);
         alert("Azure login failed: " + error.message);
