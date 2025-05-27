@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>GMMCO SSO Login</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png">
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
@@ -30,8 +30,7 @@
       font-weight: bold;
       margin-bottom: 30px;
     }
-    input[type="email"],
-    input[type="password"] {
+    input[type="email"] {
       width: 100%;
       padding: 10px;
       margin: 10px 0;
@@ -57,24 +56,24 @@
 </head>
 <body>
   <div class="login-container">
-    <h2>GMMCO CI Dashboard Login </h2>
+    <h2>GMMCO CI Dashboard Login</h2>
     <label for="email">EMAIL</label><br />
-    <input type="email" id="email" /><br />
-    <label for="password">PASSWORD</label><br />
-    <input type="password" id="password" /><br />
+    <input type="email" id="email" placeholder="user@gmmcoindia.com" /><br />
     <button onclick="login()">LOGIN</button>
     <span class="sso-link" onclick="loginWithAzure()">Azure AD SSO login</span>
   </div>
-  <!-- 🔽 Paste your Azure AD logic here -->
+
   <script>
     const msalConfig = {
       auth: {
-        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5", // <-- Replace with your Azure AD Application ID
+        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5", // Azure AD App ID
         authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
         redirectUri: window.location.href
       }
     };
+
     const msalInstance = new msal.PublicClientApplication(msalConfig);
+
     async function loginWithAzure() {
       try {
         const loginResponse = await msalInstance.loginPopup({
@@ -87,16 +86,18 @@
         alert("Azure login failed: " + error.message);
       }
     }
+
     function login() {
-  const email = document.getElementById("email").value.trim();
-  const password = document.getElementById("password").value.trim();
-  if (email && password) {
-    localStorage.setItem("gmmcoLoggedIn", "true");
-    window.location.href = "index.html";
-  } else {
-    alert("Please enter email and password.");
-  }
-}
+      const email = document.getElementById("email").value.trim();
+      const domain = "@gmmcoindia.com";
+
+      if (email && email.endsWith(domain)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        window.location.href = "index.html";
+      } else {
+        alert("Only @gmmcoindia.com emails are allowed.");
+      }
+    }
   </script>
 </body>
 </html>
