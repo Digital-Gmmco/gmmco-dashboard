@@ -65,10 +65,11 @@
 
   <script>
     const msalConfig = {
-      auth: {
+     auth: {
         clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5", // Azure AD App ID
         authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
         redirectUri:"https://uat.gmmco.in/gmmco-dashboard/login.html/callback",
+        knownAuthorities:["uat.gmmco.in"],
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
