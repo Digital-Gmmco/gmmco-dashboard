@@ -29,13 +29,21 @@ const sbuMapping = {
 };
 
 let modelData = {};
-
 function formatBillingPeriod() {
   const today = new Date();
-  const month = today.toLocaleString("default", { month: "long" });
-  const year = today.getFullYear();
+  const tomorrow = new Date(today);
+  tomorrow.setDate(today.getDate() + 1);
+
+  const isLastDayOfMonth = tomorrow.getDate() === 1;
+
+  const billingDate = isLastDayOfMonth ? tomorrow : today;
+
+  const month = billingDate.toLocaleString("default", { month: "long" });
+  const year = billingDate.getFullYear();
+
   document.getElementById("billing-period").textContent = `Billing Period: ${month} ${year}`;
 }
+
 
 async function loadDashboard() {
   try {
@@ -95,7 +103,6 @@ function isInstalledYearValid(installed) {
   const year = parseInt(parts[2], 10);
   return year !== 2023 && year !== 2024;
 }
-
 function processAndRenderData(data) {
   modelData = {};
   data.forEach(item => {
@@ -113,7 +120,7 @@ function processAndRenderData(data) {
     }
 // Exclude specific unwanted record
 if (item["Asset ID"]?.toString().trim() === "57318") {
-  console.log("✅ Excluded Asset ID: 57318");
+  console.log("Excluded ");
   return;
 }
     const model = item.Name?.trim() || "";
@@ -136,7 +143,6 @@ if (item["Asset ID"]?.toString().trim() === "57318") {
         records: []
       };
     }
-
     if (sbu === "North") modelData[modelNumber].North++;
     else if (sbu === "South") modelData[modelNumber].South++;
     else if (sbu === "East") modelData[modelNumber].East++;
