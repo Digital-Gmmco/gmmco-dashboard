@@ -20,14 +20,14 @@ const products = [
   { model: "777G", group: "GCI" }, { model: "770", group: "GCI" },
   { model: "772", group: "GCI" }, { model: "cs533e", group: "GCI" },
   { model: "980SMA", group: "GCI" }, { model: "631k", group: "GCI" },
-  { model: "374", group: "GCI" },{model:"CT100", group:"GCI"},
-  {model:"m14", group:"GCI"}, {model:"d9r", group:"GCI"},
-  {model:"962", group:"GCI"},{model:"1025",group:"GCI"},
-  {model:"303", group:"GCI"}, {model:"966e",group:"GCI"},
-{model:"980l", group:"GCI"}, {model:"325",group:"GCI"},
-{model:"426F2", group:"GCI"},{model:"12k", group:"GCI"},
-{model:"966h", group:"GCI"},{model:"ayw00562", group:"GCI"},
-{model:"trans 966h", group:"GCI"},{model:"PC600", group:"GCI"},
+  { model: "374", group: "GCI" }, { model: "CT100", group: "GCI" },
+  { model: "m14", group: "GCI" }, { model: "d9r", group: "GCI" },
+  { model: "962", group: "GCI" }, { model: "1025", group: "GCI" },
+  { model: "303", group: "GCI" }, { model: "966e", group: "GCI" },
+  { model: "980l", group: "GCI" }, { model: "325", group: "GCI" },
+  { model: "426F2", group: "GCI" }, { model: "12k", group: "GCI" },
+  { model: "966h", group: "GCI" }, { model: "ayw00562", group: "GCI" },
+  { model: "trans 966h", group: "GCI" }, { model: "PC600", group: "GCI" }
 ];
 
 const sbuMapping = {
@@ -66,7 +66,7 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-  let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
+  let url = "http://localhost:3000/get-asset-report";
   const params = [];
   if (month) params.push(`month=${month}`);
   if (year) params.push(`year=${year}`);
@@ -84,30 +84,38 @@ function applyFilters() {
 
 function processAndRenderData(data) {
   modelData = {};
-
   const month = document.getElementById("month-select").value;
   const year = document.getElementById("year-select").value;
   const selectedGroup = document.getElementById("group-select").value;
 
   const filteredData = data.filter(item => {
-    const installedStr = item["Date Installed"];
-    if (!installedStr) return false;
-    const installedDate = new Date(installedStr);
-    if (isNaN(installedDate.getTime())) return false;
-    const installedMonth = String(installedDate.getMonth() + 1).padStart(2, '0');
-    const installedYear = String(installedDate.getFullYear());
-    return (!year || installedYear === year) && (!month || installedMonth === month);
+    const purchasedStr = item["Date Purchased"];
+    if (!purchasedStr) {
+      console.warn("⛔ Skipped: Missing Date Purchased", item);
+      return false;
+    }
+    const purchasedDate = new Date(purchasedStr);
+    if (isNaN(purchasedDate.getTime())) {
+      console.warn("⛔ Skipped: Invalid Date", purchasedStr);
+      return false;
+    }
+    const purchasedMonth = String(purchasedDate.getMonth() + 1).padStart(2, '0');
+    const purchasedYear = String(purchasedDate.getFullYear());
+    return purchasedYear === year && purchasedMonth === month;
   });
+
+  console.log("✅ Filtered entries:", filteredData.length);
 
   filteredData.forEach(item => {
     const name = item.Name?.trim() || "";
     const productNumber = item["Product Number"]?.trim() || "";
     const description = item["Product Description"]?.trim() || "";
+    const nameLower = name.toLowerCase();
 
     if (/hammer\s*kit/i.test(name)) return;
 
     let matchedProduct = products.find(p =>
-      name.toLowerCase().includes(p.model.toLowerCase()) ||
+      nameLower.includes(p.model.toLowerCase()) ||
       productNumber.toLowerCase().includes(p.model.toLowerCase()) ||
       description.toLowerCase().includes(p.model.toLowerCase())
     );
@@ -115,30 +123,28 @@ function processAndRenderData(data) {
     let modelNumber = matchedProduct ? matchedProduct.model : productNumber || "Unknown";
     let group = matchedProduct ? matchedProduct.group : "Unknown";
 
-    // ❌ Explicitly skip this unwanted entry
-const nameLower = name.trim().toLowerCase();
+    if (group === "Unknown") {
+      console.warn("🔍 Unknown group:", name);
+    }
 
-// ❌ Skip specific unwanted entries
-if (
-  group === "Unknown" &&
-  (
-    nameLower.includes("eind230c9.3") ||
-    nameLower.includes("c9.3b") ||
-    nameLower.includes("af220") ||
-    nameLower.includes("one time eq for iims") ||
-    nameLower.includes("966h") ||        // NEW
-    nameLower.includes("ayw00562") ||    // NEW
-    nameLower.includes("trans 966h")     // NEW
-  )
-) {
-  console.warn("❌ Skipping unwanted model:", name);
-  return;
-}
-
-
+    // Skip specific unwanted entries
+    if (
+      group === "Unknown" &&
+      (
+        nameLower.includes("eind230c9.3") ||
+        nameLower.includes("c9.3b") ||
+        nameLower.includes("af220") ||
+        nameLower.includes("one time eq for iims") ||
+        nameLower.includes("966h") ||
+        nameLower.includes("ayw00562") ||
+        nameLower.includes("trans 966h")
+      )
+    ) {
+      console.warn("❌ Skipped: Unwanted entry", name);
+      return;
+    }
 
     let imageKey = matchedProduct ? matchedProduct.model : modelNumber;
-
     let sbu = item.SBU?.trim();
     if (!sbu) {
       const prefix = item.Plant_Code?.substring(0, 2).toUpperCase();
@@ -166,6 +172,7 @@ if (
     });
   }
 
+  console.log("✅ Models rendered:", Object.keys(modelData).length);
   renderTable(modelData);
 }
 
@@ -183,7 +190,7 @@ function renderTable(dataMap) {
     totalEast += data.East;
 
     const rowId = data.modelNumber.replace(/\W+/g, "");
-    let imgSrc = data.fullModel.toLowerCase().includes("engine")
+    const imgSrc = data.fullModel.toLowerCase().includes("engine")
       ? 'images/engine.png'
       : `images/${(data.imageKey || data.modelNumber).toLowerCase().replace(/\s+/g, "")}.png`;
 
