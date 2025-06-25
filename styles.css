@@ -220,7 +220,7 @@ footer {
   margin: 20px 0;
 }
 
-/* Date Filter Styling */
+/* === Date Filter Styling === */
 .date-filter {
   margin: 20px 0;
   text-align: center;
@@ -261,23 +261,23 @@ footer {
 .date-filter button:hover {
   background-color: #0066cc;
 }
-/* 🎯 Centered Filter Container */
+
+/* === Filter Container === */
 .filter-container {
   display: flex;
-  justify-content: center;  /* Center horizontally */
+  justify-content: center;
   padding: 20px 0;
 }
 
-/* 📦 Layout for filters */
 .filter-right {
   display: flex;
   align-items: center;
   gap: 12px;
-  flex-wrap: wrap; /* responsive wrapping on small screens */
+  flex-wrap: wrap;
 }
 
-/* 🎨 Filter dropdown styles */
-.filter-right select {
+/* === Filter Dropdowns (Global Fallback Style) === */
+select {
   padding: 6px 12px;
   border: 2px solid #004c97;
   border-radius: 6px;
@@ -287,12 +287,12 @@ footer {
   transition: border 0.3s;
 }
 
-.filter-right select:focus {
+select:focus {
   border-color: #007bff;
   outline: none;
 }
 
-/* 🎨 Apply button styles */
+/* === Apply Button === */
 .filter-right button {
   padding: 6px 14px;
   background-color: #004c97;
@@ -374,14 +374,10 @@ footer {
     flex-direction: column;
     gap: 8px;
   }
-  .date-filter input[type="date"] {
-    width: 100%;
-    max-width: 250px;
-  }
+  .date-filter input[type="date"],
   .date-filter button {
     width: 100%;
     max-width: 250px;
-    padding: 8px 0;
   }
 }
 
