@@ -89,7 +89,7 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-  let url = "http://localhost:3000/get-asset-report";
+  let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
   const params = [];
   if (month) params.push(`month=${month}`);
   if (year) params.push(`year=${year}`);
