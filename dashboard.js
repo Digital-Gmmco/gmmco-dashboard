@@ -114,8 +114,9 @@ function processAndRenderData(data) {
  const filteredData = data.filter(item => {
   const purchasedStr = item["Date Purchased"];
   if (!purchasedStr) return false;
-  const purchasedDate = new Date(
-  new Date(purchasedStr).toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
+ const purchasedDate = new Date(purchasedStr);
+purchasedDate.setMinutes(purchasedDate.getMinutes() + 330);
+
 );
 
   if (isNaN(purchasedDate.getTime())) return false;
