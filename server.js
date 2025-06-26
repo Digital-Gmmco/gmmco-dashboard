@@ -47,17 +47,26 @@ app.get('/get-asset-report', async (req, res) => {
     const response = await fetch(urlWithBust);
     if (!response.ok) throw new Error("Blob fetch failed");
 
-    const rawText = await response.text();
-    const allData = rawText.split("\n")
-      .filter(line => line.trim())
-      .map(line => {
-        try {
-          return JSON.parse(line);
-        } catch {
-          return null;
-        }
-      })
-      .filter(item => item !== null);
+   const rawText = await response.text();
+
+let allData = [];
+try {
+  allData = JSON.parse(rawText); // Try treating it as a full array
+} catch (err) {
+  console.warn("⚠️ Fallback to JSONL mode");
+  allData = rawText
+    .split("\n")
+    .filter(line => line.trim())
+    .map(line => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .filter(item => item !== null);
+}
+
 
     const { month, year } = req.query;
     const allowedDivisions = ["02", "03", "04", "07"];
