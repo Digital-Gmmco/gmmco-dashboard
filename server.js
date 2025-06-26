@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Allow frontend origins (adjust as needed)
+// Allow frontend origins
 app.use(cors({
   origin: [
     'http://localhost:8081',
@@ -19,7 +19,7 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-// Serve static files from 'frontend' folder
+// Serve static files
 app.use(express.static(path.join(__dirname, 'frontend')));
 
 // Azure Auth Config endpoint (if needed)
@@ -30,24 +30,22 @@ app.get('/config', (req, res) => {
   });
 });
 
-// Azure Blob Storage URL for JSONL data (update this if it changes)
+// Azure Blob Storage JSONL URL
 const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-05-17T13:48:14Z&se=2025-07-11T21:48:14Z&spr=https&sv=2024-11-04&sr=b&sig=aOXpZeNPt7zjjcM%2FJjMegssfgI%2Bm7CeJrlVfPx4IQ5s%3D";
 
-// Health check endpoint
+// Health check
 app.get('/', (req, res) => {
   res.send("✅ GMMCO API Server is Running");
 });
 
-// Main endpoint to fetch and filter asset report
+// Endpoint to get filtered asset report
 app.get('/get-asset-report', async (req, res) => {
   try {
-    // Fetch JSONL data from blob storage
     const response = await fetch(blobUrl);
     if (!response.ok) throw new Error("Blob fetch failed");
 
     const rawText = await response.text();
 
-    // Parse JSON Lines data
     const allData = rawText
       .split("\n")
       .filter(line => line.trim())
@@ -60,19 +58,16 @@ app.get('/get-asset-report', async (req, res) => {
       })
       .filter(item => item !== null);
 
-    // Extract filters from query params
     const { month, year } = req.query;
 
-    // Filter data
     const filtered = allData.filter(item => {
-      // Use "Date Installed" for filtering
-const purchased = item["Date Purchased"];
-if (!purchased || !purchased.includes("-")) return false;
+      const purchased = item["Date Purchased"];
+      const purchasedDate = new Date(purchased);
+      if (isNaN(purchasedDate.getTime())) return false;
 
-const [yyyy, mm] = purchased.split("-");
+      const purchasedMonth = String(purchasedDate.getMonth() + 1).padStart(2, '0');
+      const purchasedYear = String(purchasedDate.getFullYear());
 
-
-      // Combine fields into searchable string
       const combinedText = `
         ${item.Name || ""}
         ${item.Model || ""}
@@ -81,24 +76,25 @@ const [yyyy, mm] = purchased.split("-");
         ${item["Serial Number"] || ""}
       `.toLowerCase();
 
-      // Exclude entries containing "engine"
       if (combinedText.includes("engine")) return false;
 
-      // Apply year/month filters if specified
-      if (year && yyyy !== year) return false;
-      if (month && mm !== month) return false;
+      if (year && purchasedYear !== year) return false;
+      if (month && purchasedMonth !== month) return false;
 
       return true;
     });
 
-    // Return filtered data as JSON
+    console.log("🧾 Total raw records:", allData.length);
+    console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
+
     res.status(200).json(filtered);
   } catch (error) {
+    console.error("❌ Server Error:", error.message);
     res.status(500).json({ error: "Failed to fetch asset report.", details: error.message });
   }
 });
 
-// Start the server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+
