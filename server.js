@@ -9,12 +9,12 @@ const PORT = 3000;
 
 // Allow frontend origins
 app.use(cors({
-/*  origin: [
+  origin: [
     'http://localhost:8081',
     'http://127.0.0.1:8081',
     'http://localhost:5500',
     'http://127.0.0.1:5500'
-  ],*/
+  ],
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type']
 }));
@@ -31,7 +31,7 @@ app.get('/config', (req, res) => {
 });
 
 // Azure Blob Storage JSONL URL
-const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-05-17T13:48:14Z&se=2025-07-11T21:48:14Z&spr=https&sv=2024-11-04&sr=b&sig=aOXpZeNPt7zjjcM%2FJjMegssfgI%2Bm7CeJrlVfPx4IQ5s%3D";
+const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-06-24T06:50:38Z&se=2026-12-31T14:50:38Z&spr=https&sv=2024-11-04&sr=b&sig=09ht14N%2B3BrWxoi1ZUUGq6RlARrIfTyhMDsivyrbLaA%3D";
 
 // Health check
 app.get('/', (req, res) => {
@@ -89,8 +89,6 @@ app.get('/get-asset-report', async (req, res) => {
 
     console.log("🧾 Total raw records:", allData.length);
     console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
-    console.log("Month:", month, "Year:", year);
-    console.log("Sample Purchased Date:", allData[0]?.["Date Purchased"]);
 
     res.status(200).json(filtered);
   } catch (error) {
