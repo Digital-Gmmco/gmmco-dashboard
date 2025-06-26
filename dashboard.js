@@ -114,10 +114,10 @@ function processAndRenderData(data) {
  const filteredData = data.filter(item => {
   const purchasedStr = item["Date Purchased"];
   if (!purchasedStr) return false;
- const purchasedDate = new Date(purchasedStr);
-purchasedDate.setMinutes(purchasedDate.getMinutes() + 330);
-
+const purchasedDate = new Date(
+  new Date(purchasedStr).toLocaleString("en-US", { timeZone: "Asia/Kolkata" })
 );
+
 
   if (isNaN(purchasedDate.getTime())) return false;
   const purchasedMonth = String(purchasedDate.getMonth() + 1).padStart(2, '0');
