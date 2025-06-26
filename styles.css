@@ -1,0 +1,414 @@
+/* === Base Styling === */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #ffffff;
+  font-size: 14px;
+  color: #2c3e50;
+}
+main {
+  padding: 15px 20px;
+  max-width: 1100px;
+  margin: 20px auto;
+}
+
+/* === Header Styling === */
+.dashboard-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  padding: 20px 30px;
+  background-color: #fff;
+  gap: 10px;
+}
+.logo {
+  height: 50px;
+  margin-right: 10px;
+}
+.title {
+  font-size: 28px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+  text-align: center;
+}
+
+/* === Back Link Styling === */
+.back-link {
+  display: block;
+  margin-top: -10px;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 16px;
+  color: purple;
+  text-decoration: none;
+  padding-bottom: 2px;
+}
+.back-link a {
+  color: #6b21a8;
+  text-decoration: none;
+}
+.back-link a:hover {
+  text-decoration: underline;
+}
+
+/* Billing Period Label */
+#billing-period {
+  font-size: 16px;
+  font-weight: 700;
+  color: #333;
+  background-color: #ffffff;
+  border: 2px solid #ccc;
+  padding: 8px 20px;
+  border-radius: 20px;
+  width: fit-content;
+  margin: 0 auto 20px auto;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+}
+
+/* === Table Styling === */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background-color: #ffffff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  overflow: hidden;
+  font-size: 14px;
+  table-layout: fixed;
+}
+th, td {
+  padding: 10px 8px;
+  text-align: center;
+  border: 1px solid #eee;
+  vertical-align: middle;
+}
+th {
+  background-color: #f4f4f4;
+  color: #333;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+tr:hover td:not(.total-row) {
+  background-color: #f0f0f0;
+  transition: 0.3s ease;
+}
+.total-row {
+  font-weight: bold;
+  background-color: #f2f2f2;
+}
+
+/* Column widths */
+th:nth-child(1), td:nth-child(1) {
+  width: 60px;
+  font-size: 13px;
+}
+th:nth-child(2), td:nth-child(2) {
+  width: 200px;
+  font-size: 14px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+th:nth-child(3), td:nth-child(3),
+th:nth-child(4), td:nth-child(4),
+th:nth-child(5), td:nth-child(5),
+th:nth-child(6), td:nth-child(6) {
+  width: 90px;
+  font-size: 14px;
+  text-align: center;
+}
+th:nth-child(7), td:nth-child(7) {
+  width: 80px;
+  min-width: 80px;
+  text-align: center;
+  white-space: nowrap;
+}
+
+/* Center MODEL column (2nd column) */
+#sales-table th:nth-child(2),
+#sales-table td:nth-child(2) {
+  text-align: center;
+  vertical-align: middle;
+}
+/* Center TOTAL column (last column) */
+#sales-table th:last-child,
+#sales-table td:last-child {
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Expand Button */
+.expand-btn {
+  margin-left: 6px;
+  padding: 2px 6px;
+  font-size: 12px;
+  background: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.expand-btn:hover {
+  background: #0056b3;
+}
+
+/* Details row style */
+.details-row td {
+  background-color: #f9f9f9;
+  font-size: 13px;
+  padding: 10px;
+}
+
+/* Live SBU container */
+.live-sbu-container {
+  text-align: center;
+  margin-top: 30px;
+}
+.live-sbu-list {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  list-style: none;
+  padding: 0;
+  flex-wrap: wrap;
+}
+.live-sbu-list li {
+  font-size: 18px;
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  margin-top: 30px;
+  font-size: 14px;
+  color: #666;
+}
+
+/* User profile avatar */
+.user-profile {
+  margin-left: auto;
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  cursor: pointer;
+}
+#user-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+}
+
+/* Logo */
+.gmmco-logo {
+  height: 70px;
+}
+
+/* Region Title */
+.region-title {
+  text-align: center;
+  font-size: 22px;
+  font-weight: bold;
+  margin: 20px 0;
+}
+
+/* === Date Filter Styling === */
+.date-filter {
+  margin: 20px 0;
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.date-filter label {
+  margin: 0 5px;
+  font-weight: bold;
+  white-space: nowrap;
+}
+
+.date-filter input[type="date"] {
+  padding: 5px 8px;
+  margin: 0 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  min-width: 140px;
+  max-width: 180px;
+}
+
+.date-filter button {
+  padding: 7px 14px;
+  background-color: #004080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 0.3s ease;
+}
+.date-filter button:hover {
+  background-color: #0066cc;
+}
+
+/* === Filter Container === */
+.filter-container {
+  display: flex;
+  justify-content: center;
+  padding: 20px 0;
+}
+
+.filter-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* === Filter Dropdowns (Global Fallback Style) === */
+select {
+  padding: 6px 12px;
+  border: 2px solid #004c97;
+  border-radius: 6px;
+  background-color: #e6f0ff;
+  color: #003366;
+  font-weight: bold;
+  transition: border 0.3s;
+}
+
+select:focus {
+  border-color: #007bff;
+  outline: none;
+}
+
+/* === Apply Button === */
+.filter-right button {
+  padding: 6px 14px;
+  background-color: #004c97;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.filter-right button:hover {
+  background-color: #007bff;
+}
+
+/* === Responsive Styles === */
+@media (max-width: 1024px) {
+  main {
+    padding: 10px 15px;
+    max-width: 95%;
+  }
+  .dashboard-header {
+    padding: 15px 20px;
+  }
+  .title {
+    font-size: 24px;
+  }
+  .gmmco-logo {
+    height: 60px;
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboard-header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+    padding: 15px 10px;
+  }
+  .logo {
+    margin: 0;
+    height: 40px;
+  }
+  .title {
+    font-size: 20px;
+    margin-top: 5px;
+  }
+  table {
+    table-layout: auto;
+    display: block;
+    overflow-x: auto;
+    white-space: nowrap;
+  }
+  th, td {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+  .live-sbu-list {
+    flex-direction: column;
+    gap: 12px;
+    font-size: 16px;
+  }
+  .expand-btn {
+    font-size: 11px;
+    padding: 2px 5px;
+  }
+  .details-row td {
+    font-size: 12px;
+    padding: 8px 6px;
+  }
+  #billing-period {
+    font-size: 14px;
+    padding: 6px 12px;
+    width: 90%;
+    max-width: 300px;
+  }
+  .date-filter {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .date-filter input[type="date"],
+  .date-filter button {
+    width: 100%;
+    max-width: 250px;
+  }
+}
+
+@media (max-width: 480px) {
+  body {
+    font-size: 12px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .dashboard-header {
+    padding: 10px 5px;
+  }
+  .logo {
+    height: 35px;
+  }
+  table {
+    font-size: 11px;
+  }
+  th, td {
+    padding: 6px 4px;
+  }
+  .expand-btn {
+    font-size: 10px;
+    padding: 2px 4px;
+  }
+  .live-sbu-list li {
+    font-size: 14px;
+  }
+  #billing-period {
+    font-size: 12px;
+    padding: 5px 10px;
+  }
+}
