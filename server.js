@@ -89,6 +89,8 @@ app.get('/get-asset-report', async (req, res) => {
 
     console.log("🧾 Total raw records:", allData.length);
     console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
+    console.log("Month:", month, "Year:", year);
+    console.log("Sample Purchased Date:", allData[0]?.["Date Purchased"]);
 
     res.status(200).json(filtered);
   } catch (error) {
