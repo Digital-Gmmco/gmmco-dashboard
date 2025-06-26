@@ -41,76 +41,59 @@ app.get('/', (req, res) => {
 // Filtered asset report endpoint
 app.get('/get-asset-report', async (req, res) => {
   try {
-    const response = await fetch(blobUrl);
+    const urlWithBust = `${blobUrl}&cacheBust=${Date.now()}`;
+    console.log("📡 Fetching asset report from:", urlWithBust);
+
+    const response = await fetch(urlWithBust);
     if (!response.ok) throw new Error("Blob fetch failed");
 
     const rawText = await response.text();
-    console.log("📥 Raw blob fetched, length:", rawText.length);
-
-    const allData = rawText
-      .split("\n")
+    const allData = rawText.split("\n")
       .filter(line => line.trim())
-      .map((line, index) => {
+      .map(line => {
         try {
           return JSON.parse(line);
-        } catch (e) {
-          console.warn(`⚠️ JSON parse failed at line ${index}:`, e.message);
+        } catch {
           return null;
         }
       })
       .filter(item => item !== null);
 
     const { month, year } = req.query;
-    console.log("🧪 Incoming Filters:", { month, year });
-
     const allowedDivisions = ["02", "03", "04", "07"];
 
     const filtered = allData.filter(item => {
       const purchased = item["Date Purchased"];
       if (!purchased) {
-        console.log("⛔️ Skipping - missing 'Date Purchased':", item["Asset ID"]);
+        console.log("⛔️ Missing Date Purchased:", item);
         return false;
       }
 
-      if (!allowedDivisions.includes(item["Division code"])) {
-        console.log("❌ Skipping - Division not allowed:", item["Division code"]);
-        return false;
-      }
+      if (!allowedDivisions.includes(item["Division code"])) return false;
 
       const [yyyy, mm] = purchased.split("T")[0].split("-");
-      const purchasedMonth = mm;
-      const purchasedYear = yyyy;
+      if (year && yyyy !== year) return false;
+      if (month && mm !== month) return false;
 
       const combinedText = `
-        ${item.Name || ""}
-        ${item.Model || ""}
-        ${item.Description || ""}
-        ${item["Product Description"] || ""}
-        ${item["Serial Number"] || ""}
+        ${item.Name || ""} ${item.Model || ""} ${item.Description || ""}
+        ${item["Product Description"] || ""} ${item["Serial Number"] || ""}
       `.toLowerCase();
 
-      if (combinedText.includes("engine")) {
-        console.log("🔧 Skipping - Contains 'engine':", item["Asset ID"]);
-        return false;
-      }
-
-      const match = (!year || purchasedYear === year) && (!month || purchasedMonth === month);
-      if (!match) {
-        console.log(`📆 Not a match (Wanted ${month}-${year}, Got ${purchasedMonth}-${purchasedYear}):`, item["Asset ID"]);
-      }
-
-      return match;
+      if (combinedText.includes("engine")) return false;
+      return true;
     });
 
-    console.log("📦 Total records:", allData.length);
-    console.log("✅ Records after filtering:", filtered.length);
+    console.log("🧾 Total Records:", allData.length);
+    console.log("✅ Filtered:", filtered.length, "| Month:", month, "| Year:", year);
 
     res.status(200).json(filtered);
-  } catch (error) {
-    console.error("🔥 API Error:", error.message);
-    res.status(500).json({ error: "Failed to fetch asset report.", details: error.message });
+  } catch (err) {
+    console.error("❌ Error in API:", err);
+    res.status(500).json({ error: "Failed to fetch asset report", details: err.message });
   }
 });
+
 
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
