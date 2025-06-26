@@ -45,28 +45,37 @@ app.get('/get-asset-report', async (req, res) => {
     if (!response.ok) throw new Error("Blob fetch failed");
 
     const rawText = await response.text();
+    console.log("📥 Raw blob fetched, length:", rawText.length);
 
     const allData = rawText
       .split("\n")
       .filter(line => line.trim())
-      .map(line => {
+      .map((line, index) => {
         try {
           return JSON.parse(line);
-        } catch {
+        } catch (e) {
+          console.warn(`⚠️ JSON parse failed at line ${index}:`, e.message);
           return null;
         }
       })
       .filter(item => item !== null);
 
     const { month, year } = req.query;
-    const allowedDivisions = ["02", "03", "04", "07"]; // ✅ ONLY these
+    console.log("🧪 Incoming Filters:", { month, year });
+
+    const allowedDivisions = ["02", "03", "04", "07"];
 
     const filtered = allData.filter(item => {
       const purchased = item["Date Purchased"];
-      if (!purchased) return false;
+      if (!purchased) {
+        console.log("⛔️ Skipping - missing 'Date Purchased':", item["Asset ID"]);
+        return false;
+      }
 
-      // ❌ Skip if Division code is not one of the allowed
-      if (!allowedDivisions.includes(item["Division code"])) return false;
+      if (!allowedDivisions.includes(item["Division code"])) {
+        console.log("❌ Skipping - Division not allowed:", item["Division code"]);
+        return false;
+      }
 
       const [yyyy, mm] = purchased.split("T")[0].split("-");
       const purchasedMonth = mm;
@@ -80,19 +89,25 @@ app.get('/get-asset-report', async (req, res) => {
         ${item["Serial Number"] || ""}
       `.toLowerCase();
 
-      if (combinedText.includes("engine")) return false;
-      if (year && purchasedYear !== year) return false;
-      if (month && purchasedMonth !== month) return false;
+      if (combinedText.includes("engine")) {
+        console.log("🔧 Skipping - Contains 'engine':", item["Asset ID"]);
+        return false;
+      }
 
-      return true;
+      const match = (!year || purchasedYear === year) && (!month || purchasedMonth === month);
+      if (!match) {
+        console.log(`📆 Not a match (Wanted ${month}-${year}, Got ${purchasedMonth}-${purchasedYear}):`, item["Asset ID"]);
+      }
+
+      return match;
     });
 
-    console.log("🧾 Total raw records:", allData.length);
-    console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
+    console.log("📦 Total records:", allData.length);
+    console.log("✅ Records after filtering:", filtered.length);
 
     res.status(200).json(filtered);
   } catch (error) {
-    console.error("❌ Server Error:", error.message);
+    console.error("🔥 API Error:", error.message);
     res.status(500).json({ error: "Failed to fetch asset report.", details: error.message });
   }
 });
