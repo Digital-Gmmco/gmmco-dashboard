@@ -7,7 +7,7 @@ const path = require('path');
 const app = express();
 const PORT = 3000;
 
-// Allow frontend origins
+// CORS setup
 app.use(cors({
   origin: [
     'http://localhost:8081',
@@ -19,10 +19,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-// Serve static files
+// Static files (if any frontend served from here)
 app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Azure Auth Config endpoint (if needed)
+// Azure Config endpoint
 app.get('/config', (req, res) => {
   res.json({
     clientId: process.env.AZURE_CLIENT_ID,
@@ -30,15 +30,15 @@ app.get('/config', (req, res) => {
   });
 });
 
-// Azure Blob Storage JSONL URL
-const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-05-17T13:48:14Z&se=2025-07-11T21:48:14Z&spr=https&sv=2024-11-04&sr=b&sig=aOXpZeNPt7zjjcM%2FJjMegssfgI%2Bm7CeJrlVfPx4IQ5s%3D";
-
 // Health check
 app.get('/', (req, res) => {
   res.send("✅ GMMCO API Server is Running");
 });
 
-// Endpoint to get filtered asset report
+// JSON blob file from Azure
+const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-05-17T13:48:14Z&se=2025-07-11T21:48:14Z&spr=https&sv=2024-11-04&sr=b&sig=aOXpZeNPt7zjjcM%2FJjMegssfgI%2Bm7CeJrlVfPx4IQ5s%3D";
+
+// Main filtered data endpoint
 app.get('/get-asset-report', async (req, res) => {
   try {
     const response = await fetch(blobUrl);
@@ -60,33 +60,32 @@ app.get('/get-asset-report', async (req, res) => {
 
     const { month, year } = req.query;
 
-   const filtered = allData.filter(item => {
-  const purchased = item["Date Purchased"];
-  if (!purchased) return false;
+    const filtered = allData.filter(item => {
+      const purchased = item["Date Purchased"];
+      if (!purchased) return false;
 
-  const [yyyy, mm] = purchased.split("T")[0].split("-");
-  const purchasedMonth = mm;
-  const purchasedYear = yyyy;
+      const [yyyy, mm] = purchased.split("T")[0].split("-");
+      const purchasedMonth = mm;
+      const purchasedYear = yyyy;
 
-  const combinedText = `
-    ${item.Name || ""}
-    ${item.Model || ""}
-    ${item.Description || ""}
-    ${item["Product Description"] || ""}
-    ${item["Serial Number"] || ""}
-  `.toLowerCase();
+      const combinedText = `
+        ${item.Name || ""}
+        ${item.Model || ""}
+        ${item.Description || ""}
+        ${item["Product Description"] || ""}
+        ${item["Serial Number"] || ""}
+      `.toLowerCase();
 
-  if (combinedText.includes("engine")) return false;
+      if (combinedText.includes("engine")) return false;
 
-  if (year && purchasedYear !== year) return false;
-  if (month && purchasedMonth !== month) return false;
+      if (year && purchasedYear !== year) return false;
+      if (month && purchasedMonth !== month) return false;
 
-  return true;
-});
+      return true;
+    });
 
-
-    console.log("🧾 Total raw records:", allData.length);
-    console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
+    console.log("📥 JSON Blob total entries:", allData.length);
+    console.log("✅ Filtered entries:", filtered.length, "| Month:", month, "| Year:", year);
 
     res.status(200).json(filtered);
   } catch (error) {
