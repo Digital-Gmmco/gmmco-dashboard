@@ -48,27 +48,14 @@ const sbuMapping = {
   KA: "South", KL: "South", TN: "South",
   GA: "West", GJ: "West", MH: "West"
 };
-// ... (Keep your products and sbuMapping as is)
+// ... your existing products[] and sbuMapping (unchanged)
 
 let modelData = {};
 
 document.addEventListener("DOMContentLoaded", () => {
-  const today = new Date();
-  let month = today.getMonth();
-  let year = today.getFullYear();
-
-  // ⏳ If it's the 1st, fall back to previous month
-  if (today.getDate() === 1) {
-    month--;
-    if (month < 0) {
-      month = 11;
-      year--;
-    }
-  }
-
-  // Set initial values
-  document.getElementById("month-select").value = String(month + 1).padStart(2, '0');
-  document.getElementById("year-select").value = String(year);
+  const { month, year } = getDefaultMonthYear();
+  document.getElementById("month-select").value = month;
+  document.getElementById("year-select").value = year;
   document.getElementById("group-select").value = "";
 
   formatBillingPeriod();
@@ -79,6 +66,23 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById(id).addEventListener("change", applyFilters);
   });
 });
+
+function getDefaultMonthYear() {
+  const today = new Date();
+  let month = today.getMonth();
+  let year = today.getFullYear();
+  if (today.getDate() === 1) {
+    month--;
+    if (month < 0) {
+      month = 11;
+      year--;
+    }
+  }
+  return {
+    month: String(month + 1).padStart(2, '0'),
+    year: String(year)
+  };
+}
 
 function formatBillingPeriod() {
   const today = new Date();
@@ -94,7 +98,6 @@ function extractISTDateParts(isoDate) {
     month: "2-digit",
     day: "2-digit"
   });
-
   const parts = dtf.formatToParts(new Date(isoDate));
   const month = parts.find(p => p.type === 'month')?.value;
   const year = parts.find(p => p.type === 'year')?.value;
@@ -106,12 +109,13 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-  let url = "https://uat.gmmco.in/gmmco-api/get-asset-report"; // or your live API
-  const params = [];
-  if (month) params.push(`month=${month}`);
-  if (year) params.push(`year=${year}`);
-  if (group) params.push(`group=${group}`);
-  if (params.length > 0) url += `?${params.join("&")}`;
+  let url = "http://localhost:3000/get-asset-report";
+  const params = new URLSearchParams();
+  if (month) params.append("month", month);
+  if (year) params.append("year", year);
+  if (group) params.append("group", group);
+
+  if (params.toString()) url += `?${params.toString()}`;
 
   fetch(url)
     .then(res => res.json())
@@ -138,7 +142,18 @@ function processAndRenderData(data) {
     const { month: purchasedMonth, year: purchasedYear } = extractISTDateParts(purchasedStr);
     const isMatch = purchasedMonth === month && purchasedYear === year;
 
-    console.log(`🗓️ Date Purchased: ${purchasedStr} → Month: ${purchasedMonth}, Year: ${purchasedYear} → Match: ${isMatch}`);
+    // 👇 Debug for Y9201545
+    if (item["Serial Number"] === "Y9201545") {
+      console.log("🔍 Debug Serial Y9201545:", {
+        raw: purchasedStr,
+        istMonth: purchasedMonth,
+        istYear: purchasedYear,
+        selectedMonth: month,
+        selectedYear: year,
+        match: isMatch
+      });
+    }
+
     return isMatch;
   });
 
@@ -152,7 +167,6 @@ function processAndRenderData(data) {
     const nameLower = name.toLowerCase();
 
     if (/^(engine|hammer)$/i.test(name.trim())) return;
-
     let matchedProduct = products.find(p =>
       nameLower.includes(p.model.toLowerCase()) ||
       productNumber.toLowerCase().includes(p.model.toLowerCase()) ||
