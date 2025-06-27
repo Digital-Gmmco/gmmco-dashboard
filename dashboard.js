@@ -151,7 +151,7 @@ function processAndRenderData(data) {
     const description = item["Product Description"]?.trim() || "";
     const nameLower = name.toLowerCase();
 
-    if (/hammer|engine|engines|eng\b/i.test(name)) return;
+    if (/^(engine|hammer)$/i.test(name.trim())) return;
 
     let matchedProduct = products.find(p =>
       nameLower.includes(p.model.toLowerCase()) ||
