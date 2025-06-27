@@ -19,10 +19,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type']
 }));
 
-// Serve static files
+// Serve frontend statically
 app.use(express.static(path.join(__dirname, 'frontend')));
 
-// Azure Auth config endpoint (if needed)
+// Azure auth config
 app.get('/config', (req, res) => {
   res.json({
     clientId: process.env.AZURE_CLIENT_ID,
@@ -30,7 +30,7 @@ app.get('/config', (req, res) => {
   });
 });
 
-// Azure Blob Storage URL with SAS token
+// Azure Blob Storage URL (with SAS token)
 const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-06-24T06:50:38Z&se=2026-12-31T14:50:38Z&spr=https&sv=2024-11-04&sr=b&sig=09ht14N%2B3BrWxoi1ZUUGq6RlARrIfTyhMDsivyrbLaA%3D";
 
 // Health check
@@ -38,11 +38,11 @@ app.get('/', (req, res) => {
   res.send("✅ GMMCO API Server is Running");
 });
 
-// Asset report endpoint
+// Main API route
 app.get('/get-asset-report', async (req, res) => {
   try {
     const urlWithCacheBust = `${blobUrl}&cacheBust=${Date.now()}`;
-    console.log("📡 Fetching from:", urlWithCacheBust);
+    console.log("📡 Fetching asset report from:", urlWithCacheBust);
 
     const response = await fetch(urlWithCacheBust);
     if (!response.ok) throw new Error("Blob fetch failed");
@@ -50,21 +50,20 @@ app.get('/get-asset-report', async (req, res) => {
     const rawText = await response.text();
     let allData = [];
 
+    // Try parsing as JSON array
     try {
-      // Try parsing as full JSON array
       allData = JSON.parse(rawText);
       console.log("✅ Parsed as full JSON array");
-    } catch (err) {
-      // Fallback: treat as JSONL
+    } catch (jsonErr) {
       console.warn("⚠️ Fallback to JSONL mode");
       allData = rawText
         .split("\n")
         .filter(line => line.trim())
-        .map(line => {
+        .map((line, index) => {
           try {
             return JSON.parse(line);
-          } catch (err) {
-            console.warn("⚠️ JSON parse failed for line:", line);
+          } catch (parseErr) {
+            console.warn(`❌ Parse error on line ${index + 1}:`, parseErr.message);
             return null;
           }
         })
@@ -81,18 +80,18 @@ app.get('/get-asset-report', async (req, res) => {
         return false;
       }
 
-      // Division code check
       if (!allowedDivisions.includes(item["Division code"])) return false;
 
-      // Match month/year
       const [yyyy, mm] = purchased.split("T")[0].split("-");
       if (year && yyyy !== year) return false;
       if (month && mm !== month) return false;
 
-      // Skip if "engine" in text
       const combinedText = `
-        ${item.Name || ""} ${item.Model || ""} ${item.Description || ""}
-        ${item["Product Description"] || ""} ${item["Serial Number"] || ""}
+        ${item.Name || ""}
+        ${item.Model || ""}
+        ${item.Description || ""}
+        ${item["Product Description"] || ""}
+        ${item["Serial Number"] || ""}
       `.toLowerCase();
 
       if (combinedText.includes("engine")) return false;
@@ -100,16 +99,21 @@ app.get('/get-asset-report', async (req, res) => {
       return true;
     });
 
-    console.log("🧾 Total records from API:", allData.length);
+    console.log("🧾 Total records:", allData.length);
     console.log("✅ Filtered records:", filtered.length, "| Month:", month, "| Year:", year);
 
     res.status(200).json(filtered);
   } catch (err) {
-    console.error("❌ API error:", err.message);
-    res.status(500).json({ error: "Failed to fetch asset report", details: err.message });
+    console.error("❌ Error in API:", err.message);
+    res.status(500).json({
+      error: "Failed to fetch asset report",
+      details: err.message
+    });
   }
 });
 
+// Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+
