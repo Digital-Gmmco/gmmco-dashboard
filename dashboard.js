@@ -26,8 +26,8 @@ const products = [
   { model: "303", group: "GCI" }, { model: "966e", group: "GCI" },
   { model: "980l", group: "GCI" }, { model: "325", group: "GCI" },
   { model: "426F2", group: "GCI" }, { model: "12k", group: "GCI" },
-  { model: "966h", group: "GCI" }, { model: "ayw00562", group: "GCI" },
-  { model: "trans 966h", group: "GCI" }, { model: "PC600", group: "GCI" },
+  { model: "966h", group: "GCI" }, 
+  { model: "PC600", group: "GCI" },
   { model: "216b3", group: "BCP" },{model:"773d", group:"GCI"},{model:"572r", group:"GCI"},
   {model:"1035nbws",group:"GCI"},{model:"1035naws",group:"GCI"},{model:"D9",group:"GCI"},
   {model:"12H",group:"GCI"},{model:"980g",group:"GCI"},{model:"cb224",group:"GCI"},{model:"980h",group:"GCI"},
@@ -35,13 +35,11 @@ const products = [
 {model:"1035NB",group:"GCI"},{model:"210_volvo",group:"GCI"},{model:"a215",group:"GCI"},{model:"16h",group:"GCI"},
 {model:"740",group:"GCI"},{model:"1035",group:"GCI"},{model:"966gii",group:"GCI"},{model:"966d",group:"GCI"},{model:"1035Na",group:"GCI"},{model:"1035N",group:"GCI"},
 {model:"1035ws",group:"GCI"},{model:"m322cmh",group:"GCI"},{model:"311cu",group:"GCI"},{model:"12g",group:"GCI"},{model:"d7g",group:"GCI"}, {model:"14g",group:"GCI"},
-{model:"cb24",group:"GCI"},{model:"TH460B",group:"GCI"},
-{model:"6018",group:"GCI"},{model:"ap-755",group:"GCI"},{model:"d11t",group:"GCI"},
+{model:"cb24",group:"GCI"},{model:"TH460B",group:"GCI"},{model:"6018",group:"GCI"},{model:"ap-755",group:"GCI"},{model:"d11t",group:"GCI"},
 {model:"210",group:"GCI"},{model:"300",group:"GCI"},{model:"cl210",group:"GCI"},{model:"329dl",group:"GCI"},{model:"d10t2",group:"GCI"},{model:"d11",group:"GCI"},
 {model:"390dl",group:"GCI"},{model:"cb534d",group:"GCI"},{model:"938",group:"GCI"}, {model:"it62h",group:"GCI"},
 {model:"329",group:"GCI"},{model:"2011",group:"GCI"},{model:"329",group:"GCI"},{model:"2071",group:"GCI"},
-{model:"324doem",group:"GCI"},{model:"324d",group:"GCI"},{model:"973c",group:"GCI"},{model:"973d",group:"GCI"},{ model: "120ng", group: "GCI" },
-
+{model:"324doem",group:"GCI"},{model:"324d",group:"GCI"},{model:"973c",group:"GCI"},{model:"973d",group:"GCI"},{ model: "120ng", group: "GCI" },{model:"992k",group:"GCI"},
 ];
 
 const sbuMapping = {
@@ -50,7 +48,7 @@ const sbuMapping = {
   KA: "South", KL: "South", TN: "South",
   GA: "West", GJ: "West", MH: "West"
 };
-// ... your existing products[] and sbuMapping (unchanged)
+
 
 let modelData = {};
 
@@ -110,15 +108,12 @@ function applyFilters() {
   const month = document.getElementById("month-select").value;
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
-
   let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
   const params = new URLSearchParams();
   if (month) params.append("month", month);
   if (year) params.append("year", year);
   if (group) params.append("group", group);
-
   if (params.toString()) url += `?${params.toString()}`;
-
   fetch(url)
     .then(res => res.json())
     .then(data => processAndRenderData(data))
@@ -127,7 +122,6 @@ function applyFilters() {
       document.getElementById("sales-body").innerHTML = `<tr><td colspan='7' style='color:red;'>❌ Failed to load filtered data</td></tr>`;
     });
 }
-
 function processAndRenderData(data) {
   modelData = {};
   const month = document.getElementById("month-select").value;
@@ -140,22 +134,8 @@ function processAndRenderData(data) {
       console.log("⛔️ Missing Date Purchased for item:", item);
       return false;
     }
-
     const { month: purchasedMonth, year: purchasedYear } = extractISTDateParts(purchasedStr);
     const isMatch = purchasedMonth === month && purchasedYear === year;
-
-    // 👇 Debug for Y9201545
-    if (item["Serial Number"] === "Y9201545") {
-      console.log("🔍 Debug Serial Y9201545:", {
-        raw: purchasedStr,
-        istMonth: purchasedMonth,
-        istYear: purchasedYear,
-        selectedMonth: month,
-        selectedYear: year,
-        match: isMatch
-      });
-    }
-
     return isMatch;
   });
 
@@ -168,7 +148,7 @@ function processAndRenderData(data) {
     const description = item["Product Description"]?.trim() || "";
     const nameLower = name.toLowerCase();
 
-    if (/^(engine|hammer)$/i.test(name.trim())) return;
+   // if (/^(engine|hammer)$/i.test(name.trim())) return;
     let matchedProduct = products.find(p =>
       nameLower.includes(p.model.toLowerCase()) ||
       productNumber.toLowerCase().includes(p.model.toLowerCase()) ||
@@ -178,13 +158,13 @@ function processAndRenderData(data) {
     let modelNumber = matchedProduct ? matchedProduct.model : productNumber || "Unknown";
     let group = matchedProduct ? matchedProduct.group : "Unknown";
 
-    const skipKeywords = [
-      "eind230c9.3", "c9.3b", "af220", "one time eq for iims", "966h",
-      "ayw00562", "trans 966h", "939:aa", "crt 5633", "992k", "crt5633", "sps855", "c9",
-      "561b", "non - cat - sos sample collectio", "sos sample collection",
-      "2gr05249", "2gr05249 - ote - thriveni earthm", "thriveni earthm", "ote - thriveni earthm",
-      "clj11448 - clbt transmission", "clbt transmission"
-    ];
+   const skipKeywords = [
+  "eind230c9.3", "c9.3b", "af220", "one time eq for iims", "966h",
+  "ayw00562", "trans 966h", "939:aa", "crt 5633", "crt5633", "sps855", "c9",
+  "561b", "non - cat - sos sample collectio", "sos sample collection",
+  "2gr05249", "2gr05249 - ote - thriveni earthm", "thriveni earthm", "ote - thriveni earthm",
+  "clj11448 - clbt transmission", "clbt transmission", "hammer kit"
+];
 
     if (
       group === "Unknown" &&
@@ -194,14 +174,12 @@ function processAndRenderData(data) {
         description.toLowerCase().includes(keyword)
       )
     ) return;
-
     let imageKey = matchedProduct ? matchedProduct.model : modelNumber;
     let sbu = item.SBU?.trim();
     if (!sbu) {
       const prefix = item.Plant_Code?.substring(0, 2).toUpperCase();
       sbu = sbuMapping[prefix] || "Unknown";
     }
-
     if (!modelData[modelNumber]) {
       modelData[modelNumber] = {
         modelNumber,
@@ -212,7 +190,6 @@ function processAndRenderData(data) {
         records: []
       };
     }
-
     modelData[modelNumber][sbu] = (modelData[modelNumber][sbu] || 0) + 1;
     modelData[modelNumber].records.push({ ...item, sbu });
   });
