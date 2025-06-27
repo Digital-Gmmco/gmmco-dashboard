@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GMMCO SSO Login</title>
+  <link rel="icon" type="image/png" href="images/gmmcoG.png">
+  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: url('images/loginpage.png') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .logo-top-left,
+    .logo-top-right {
+      position: absolute;
+      top: 20px;
+    }
+    .logo-top-left {
+      left: 20px;
+    }
+    .logo-top-right {
+      right: 20px;
+    }
+    .logo-top-left img,
+    .logo-top-right img {
+      height: 50px;
+      width: auto;
+    }
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 340px;
+      backdrop-filter: blur(5px);
+    }
+    .login-card h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #222;
+      background-color: #fcd300;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .sso-button {
+      margin-top: 25px;
+      padding: 12px 20px;
+      background: linear-gradient(to right, #004e92, #000428);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      font-size: 14px;
+      width: 100%;
+    }
+    .sso-button:hover {
+      background: linear-gradient(to right, #0058a3, #1a1a60);
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logo in the top-left corner -->
+  <div class="logo-top-left">
+    <img src="images/gmmco-logo.png" alt="GMMCO Logo">
+  </div>
+  <!-- New logo in the top-right corner -->
+  <div class="logo-top-right">
+    <img src="images/gmmcocat.png" alt="GMMCO CAT Logo">
+  </div>
+  <div class="login-card">
+    <h2>GMMCO CI Dashboard Login</h2>
+    <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
+    <div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
+  </div>
+  <script>
+    const msalConfig = {
+      auth: {
+        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri:"https://uat.gmmco.in/gmmco-dashboard/index.html",
+        knownAuthorities:["uat.gmmco.in"],
+      }
+    };
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    const allowedEmails = [
+      "arunprasad.r@gmmcoindia.com",
+      "meenakshi.v@gmmcoindia.com",
+      "user5@gmmco.in",
+      "user6@gmmco.in",
+      "user7@gmmco.in",
+      "user8@gmmco.in",
+      "user9@gmmco.in",
+      "user10@gmmco.in",
+      "user11@gmmco.in",
+      "user12@gmmco.in",
+      "user13@gmmco.in",
+      "user14@gmmco.in",
+      "user15@gmmco.in",
+      "user16@gmmco.in",
+      "user17@gmmco.in",
+      "user18@gmmco.in",
+      "user19@gmmco.in",
+      "user20@gmmco.in"
+    ];
+    async function loginWithAzure() {
+      try {
+        const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+        const userEmail = loginResponse.account.username.toLowerCase();
+        if (allowedEmails.includes(userEmail)) {
+         sessionStorage.setItem("gmmcoLoggedIn", "true");
+sessionStorage.setItem("gmmcoEmail", userEmail);
+          window.location.href = "/gmmco-dashboard/index.html";
+        } else {
+          alert("Access denied: Your account is not authorized to access this dashboard.");
+          window.location.href = "/gmmco-dashboard/access-denied.html";
+        }
+      } catch (error) {
+        console.error(error);
+        alert("Azure login failed: " + error.message);
+      }
+    }
+  </script>
+</body>
+</html> 
