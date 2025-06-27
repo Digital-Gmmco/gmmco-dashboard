@@ -1,9 +1,4 @@
 const products = [
-  { model: "320d3gc", group: "GCI" },
-{ model: "323d3", group: "GCI" },
-{ model: "sem818f", group: "SEM" },
-{ model: "sem636d", group: "SEM" },
-{ model: "424-backhoe loader_industrial tyres", group: "BCP" },
   { model: "424", group: "BCP" }, { model: "320", group: "GCI" },
   { model: "323", group: "GCI" }, { model: "656", group: "SEM" },
   { model: "2021", group: "BCP" }, { model: "313", group: "GCI" },
