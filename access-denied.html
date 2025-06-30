@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Access Denied - GMMCO CI Dashboard</title>
+  <link rel="icon" type="image/png" href="images/gmmcoG.png">
+  <style>
+    *{
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: url('images/loginpage.png') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
+    }
+    .logo-top-left,
+    .logo-top-right {
+      position: absolute;
+      top: 20px;
+    }
+    .logo-top-left {
+      left: 20px;
+    }
+    .logo-top-right {
+      right: 20px;
+    }
+    .logo-top-left img,
+    .logo-top-right img {
+      height: 50px;
+      width: auto;
+    }
+    .denied-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 400px;
+      backdrop-filter: blur(5px);
+    }
+    .denied-card h2 {
+      font-size: 22px;
+      margin-bottom: 15px;
+      color: #b00020;
+    }
+    .denied-card p {
+      font-size: 14px;
+      color: #444;
+      margin-bottom: 25px;
+    }
+    .home-button {
+      padding: 10px 20px;
+      background-color: #004e92;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .home-button:hover {
+      background-color: #003366;
+    }
+    .footer {
+      margin-top: 20px;
+      font-size: 12px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <!-- Logos -->
+  <div class="logo-top-left">
+    <img src="images/gmmco-logo.png" alt="GMMCO Logo">
+  </div>
+  <div class="logo-top-right">
+    <img src="images/gmmcocat.png" alt="GMMCO CAT Logo">
+  </div>
+
+  <div class="denied-card">
+    <h2>Access Denied</h2>
+    <p>Sorry, your account is not authorized to access the GMMCO CI Dashboard.<br/>
+       Please contact digital team for futher support</p>
+    <button class="home-button" onclick="window.location.href='login.html'">Return to Login</button>
+    <div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
+  </div>
+</body>
+</html>
