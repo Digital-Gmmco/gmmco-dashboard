@@ -133,6 +133,8 @@ if (!(productNumber.toLowerCase().includes("120ng") || name.toLowerCase().includ
     }
 
     console.log("✅ Final entries returned:", results.length);
+    console.log("🧪 DEBUG LOCAL FILE", results.length);
+
     res.status(200).json(results);
   } catch (err) {
     console.error("❌ API error:", err.message);
