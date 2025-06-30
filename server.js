@@ -33,7 +33,7 @@ app.get('/config', (req, res) => {
 });
 
 // Azure Blob URL with SAS token
-const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-06-27T13:05:00Z&se=2026-09-29T21:05:00Z&spr=https&sv=2024-11-04&sr=b&sig=imGKFHSGJzV%2FLLG94qpxTsIxRJFzu9M7zFeyJIM4nOA%3D";
+const blobUrl = "https://gmmcopbistorageaccount.blob.core.windows.net/gmmco-dwh/API/Asset_Report/Asset_Report.json?sp=r&st=2025-05-17T13:48:14Z&se=2025-07-11T21:48:14Z&spr=https&sv=2024-11-04&sr=b&sig=aOXpZeNPt7zjjcM%2FJjMegssfgI%2Bm7CeJrlVfPx4IQ5s%3D ";
 
 // Health check
 app.get('/', (req, res) => {
