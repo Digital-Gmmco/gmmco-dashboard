@@ -5,6 +5,11 @@
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
   <link rel="stylesheet" href="styles.css?v=4" />
+  <script>
+ if (!localStorage.getItem("gmmcoLoggedIn")) {
+   window.location.href = "login.html";
+    }
+  </script>
 </head>
 <body>
   <header>
@@ -15,15 +20,10 @@
     </div>
     <hr>
   </header>
-
   <main>
     <div class="live-period-container">
       <div id="billing-period" class="billing-period">LIVE BILLING PERIOD: June 2025</div>
     </div>
-
-    <!-- ✅ DEBUG OUTPUT AREA -->
-    <div id="debug-output" style="padding: 1rem; color: red; font-size: 14px;"></div>
-
     <section class="filter-container">
       <div class="filter-right">
         <label for="month-select">Month:</label>
@@ -42,7 +42,6 @@
           <option value="11">November</option>
           <option value="12">December</option>
         </select>
-
         <label for="year-select">Year:</label>
         <select id="year-select">
           <option value="">--Select Year--</option>
@@ -53,7 +52,6 @@
           <option value="2021">2021</option>
           <option value="2020">2020</option>
         </select>
-
         <label for="group-select">Group:</label>
         <select id="group-select">
           <option value="">All</option>
@@ -61,11 +59,9 @@
           <option value="GCI">GCI</option>
           <option value="SEM">SEM</option>
         </select>
-
         <button onclick="applyFilters()">Apply</button>
       </div>
     </section>
-
     <table id="sales-table">
       <thead>
         <tr>
@@ -93,18 +89,13 @@
       </tfoot>
     </table>
   </main>
-
   <footer>
     <hr />
     &copy; 2025 GMMCO CI Sales Dashboard - Live
     <hr />
   </footer>
-
-  <!-- ✅ Load dashboard.js with cache-busting -->
-  <script>
-    const script = document.createElement('script');
-    script.src = `dashboard.js?v=${Date.now()}`;
-    document.body.appendChild(script);
-  </script>
+  <script src="dashboard.js?v=6"></script>
 </body>
 </html>
+
+
