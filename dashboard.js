@@ -1,5 +1,3 @@
-// dashboard.js
-
 const products = [
   { model: "120", group: "GCI" } // Debug: Only test this model
 ];
@@ -70,7 +68,7 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-  let url = "http://localhost:3000/get-asset-report";
+  let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
 
   const params = new URLSearchParams();
   if (month) params.append("month", month);
@@ -78,9 +76,14 @@ function applyFilters() {
   if (group) params.append("group", group);
   if (params.toString()) url += `?${params.toString()}`;
 
+  console.log("📤 Fetching API:", url);
+
   fetch(url)
     .then(res => res.json())
-    .then(data => processAndRenderData(data))
+    .then(data => {
+      console.log("📥 Raw data received:", data.length);
+      processAndRenderData(data);
+    })
     .catch(err => {
       console.error("❌ Error fetching filtered data:", err);
       document.getElementById("sales-body").innerHTML = `<tr><td colspan='7' style='color:red;'>❌ Failed to load filtered data</td></tr>`;
@@ -93,6 +96,8 @@ function processAndRenderData(data) {
   const year = document.getElementById("year-select").value;
   const selectedGroup = document.getElementById("group-select").value;
 
+  console.log("📆 Filter Params:", { month, year, selectedGroup });
+
   const filteredData = data.filter(item => {
     const purchasedStr = item["Date Purchased"];
     if (!purchasedStr) return false;
@@ -100,21 +105,29 @@ function processAndRenderData(data) {
     return purchasedMonth === month && purchasedYear === year;
   });
 
+  console.log("🔎 After IST Date filter:", filteredData.length);
+
   const allowedDivisions = ["02", "03", "04", "07"];
   const divisionFilteredData = filteredData.filter(item => {
     const division = item["Division code"]?.toString().trim();
     return allowedDivisions.includes(division);
   });
 
+  console.log("🏢 After Division filter:", divisionFilteredData.length);
+
   divisionFilteredData.forEach(item => {
     const name = item.Name?.trim() || "";
     const productNumber = item["Product Number"]?.trim() || "";
     const description = item["Product Description"]?.trim() || "";
+    const lowerCombined = `${name} ${productNumber} ${description}`.toLowerCase();
+
+    const isMatch = lowerCombined.includes("120ng");
+    if (!isMatch) return;
 
     const modelNumber = "120NG";
     const group = "GCI";
-
     const imageKey = modelNumber;
+
     let sbu = item.SBU?.trim();
     if (!sbu) {
       const prefix = item.Plant_Code?.substring(0, 2).toUpperCase();
@@ -134,8 +147,18 @@ function processAndRenderData(data) {
 
     modelData[modelNumber][sbu] = (modelData[modelNumber][sbu] || 0) + 1;
     modelData[modelNumber].records.push({ ...item, sbu });
+
+    console.log("✅ Matched 120NG Entry:", {
+      name,
+      productNumber,
+      description,
+      sbu,
+      "Date Purchased": item["Date Purchased"],
+      "Plant Code": item["Plant_Code"]
+    });
   });
 
+  console.log("📊 Final modelData for 120NG:", modelData);
   renderTable(modelData);
 }
 
@@ -182,6 +205,14 @@ function renderTable(dataMap) {
   document.getElementById("total-west").textContent = totalWest;
   document.getElementById("total-east").textContent = totalEast;
   document.getElementById("grand-total").textContent = totalNorth + totalSouth + totalWest + totalEast;
+
+  console.log("📊 Totals:", {
+    North: totalNorth,
+    South: totalSouth,
+    West: totalWest,
+    East: totalEast,
+    Grand: totalNorth + totalSouth + totalWest + totalEast
+  });
 }
 
 function toggleDetails(modelNumber, region) {
