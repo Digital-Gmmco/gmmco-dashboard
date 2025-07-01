@@ -1,5 +1,5 @@
 const products = [
-  { model: "120", group: "GCI" } // Debug: Only test this model
+  { model: "120", group: "GCI" }
 ];
 
 const sbuMapping = {
@@ -94,9 +94,8 @@ function processAndRenderData(data) {
   modelData = {};
   const month = document.getElementById("month-select").value;
   const year = document.getElementById("year-select").value;
-  const selectedGroup = document.getElementById("group-select").value;
 
-  console.log("📆 Filter Params:", { month, year, selectedGroup });
+  console.log("📆 Filtering for:", { month, year });
 
   const filteredData = data.filter(item => {
     const purchasedStr = item["Date Purchased"];
@@ -105,7 +104,7 @@ function processAndRenderData(data) {
     return purchasedMonth === month && purchasedYear === year;
   });
 
-  console.log("🔎 After IST Date filter:", filteredData.length);
+  console.log("🔍 IST Date Filtered:", filteredData.length);
 
   const allowedDivisions = ["02", "03", "04", "07"];
   const divisionFilteredData = filteredData.filter(item => {
@@ -113,7 +112,7 @@ function processAndRenderData(data) {
     return allowedDivisions.includes(division);
   });
 
-  console.log("🏢 After Division filter:", divisionFilteredData.length);
+  console.log("🏢 Division Filtered:", divisionFilteredData.length);
 
   divisionFilteredData.forEach(item => {
     const name = item.Name?.trim() || "";
@@ -121,7 +120,7 @@ function processAndRenderData(data) {
     const description = item["Product Description"]?.trim() || "";
     const lowerCombined = `${name} ${productNumber} ${description}`.toLowerCase();
 
-    const isMatch = lowerCombined.includes("120ng");
+    const isMatch = lowerCombined.includes("120ng") || productNumber.includes("120") || name.includes("120");
     if (!isMatch) return;
 
     const modelNumber = "120NG";
@@ -148,17 +147,14 @@ function processAndRenderData(data) {
     modelData[modelNumber][sbu] = (modelData[modelNumber][sbu] || 0) + 1;
     modelData[modelNumber].records.push({ ...item, sbu });
 
-    console.log("✅ Matched 120NG Entry:", {
-      name,
-      productNumber,
-      description,
-      sbu,
+    console.log("✅ 120NG Matched:", {
+      name, productNumber, description, sbu,
       "Date Purchased": item["Date Purchased"],
       "Plant Code": item["Plant_Code"]
     });
   });
 
-  console.log("📊 Final modelData for 120NG:", modelData);
+  console.log("📊 Final modelData:", modelData);
   renderTable(modelData);
 }
 
@@ -177,7 +173,6 @@ function renderTable(dataMap) {
 
     const rowId = data.modelNumber.replace(/\W+/g, "");
     const imgSrc = `images/${(data.imageKey || data.modelNumber).toLowerCase().replace(/\s+/g, "")}.png`;
-
 
     const row = `
       <tr>
@@ -205,12 +200,8 @@ function renderTable(dataMap) {
   document.getElementById("total-east").textContent = totalEast;
   document.getElementById("grand-total").textContent = totalNorth + totalSouth + totalWest + totalEast;
 
-  console.log("📊 Totals:", {
-    North: totalNorth,
-    South: totalSouth,
-    West: totalWest,
-    East: totalEast,
-    Grand: totalNorth + totalSouth + totalWest + totalEast
+  console.log("📊 Region Totals:", {
+    North: totalNorth, South: totalSouth, West: totalWest, East: totalEast
   });
 }
 
