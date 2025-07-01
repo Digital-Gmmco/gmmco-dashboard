@@ -26,8 +26,8 @@ app.use(express.static(path.join(__dirname, 'frontend')));
 // Azure credentials if frontend needs them
 app.get('/config', (req, res) => {
   res.json({
-    clientId: process.env.AZURE_CLIENT_ID,
-    tenantId: process.env.AZURE_TENANT_ID
+     clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+    tenantId: "457051ff-d001-4f04-9afa-892af205a547s"
   });
 });
 
