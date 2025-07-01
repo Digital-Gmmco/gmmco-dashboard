@@ -135,7 +135,7 @@ function applyFilters() {
   const group = document.getElementById("group-select").value;
 
  
-let url = "http://localhost:3000/get-asset-report";
+let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
 //let url = "https://uat.gmmco.in/gmmco-api/get-asset-report?v=" + Date.now();
 
 
