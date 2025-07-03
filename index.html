@@ -6,11 +6,11 @@
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
   <link rel="stylesheet" href="styles.css?v=4" />
   <script>
- if (!localStorage.getItem("gmmcoLoggedIn")) {
-window.location.href = "login.html";
-  }
+    // Uncomment below to enable login check
+     if (!localStorage.getItem("gmmcoLoggedIn")) {
+      window.location.href = "login.html";
+    }
   </script>
-
 </head>
 <body>
   <header>
@@ -23,10 +23,9 @@ window.location.href = "login.html";
   </header>
 
   <main>
-   <div class="live-period-container">
-  <div id="billing-period" class="">Loading...</div>
-</div>
-
+    <div class="live-period-container">
+      <div id="billing-period">Loading...</div>
+    </div>
 
     <section class="filter-container">
       <div class="filter-right">
@@ -36,8 +35,8 @@ window.location.href = "login.html";
         <label for="year-select">Year:</label>
         <select id="year-select">
           <option value="">--Select Year--</option>
-          <option value="2024">FY 2024</option>
-          <option value="2025">FY 2025</option>
+          <option value="2024">FY 2024 - 2025</option>
+          <option value="2025">FY 2025 - 2026</option>
         </select>
 
         <label for="group-select">Group:</label>
@@ -103,19 +102,20 @@ window.location.href = "login.html";
       { value: "02", name: "February" },
       { value: "03", name: "March" }
     ];
+  function rebuildMonthOptions(financialYear) {
+    monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
+    months.forEach((month) => {
+      const actualYear = parseInt(month.value) < 4 
+        ? parseInt(financialYear) + 1 
+        : parseInt(financialYear);
 
-    function rebuildMonthOptions(financialYear) {
-      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
-      months.forEach((month) => {
-        const labelYear = parseInt(month.value) < 4 
-          ? parseInt(financialYear) + 1 
-          : parseInt(financialYear);
-        const option = document.createElement("option");
-        option.value = month.value;
-        option.textContent = `${month.name} ${labelYear}`;
-        monthSelect.appendChild(option);
-      });
-    }
+      const option = document.createElement("option");
+      option.value = month.value;
+      option.textContent = `${month.name} ${actualYear}`; // Clean label
+      monthSelect.appendChild(option);
+    });
+  }
+
 
     function applyFilters() {
       const selectedYear = yearSelect.value;
@@ -130,10 +130,9 @@ window.location.href = "login.html";
         group: selectedGroup
       });
 
-      // dashboard.js handles billing period update
+      // Dashboard logic will use this selection via dashboard.js
     }
 
-    // Initialize dropdowns on page load
     window.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
       const thisMonth = today.getMonth() + 1;
@@ -148,17 +147,15 @@ window.location.href = "login.html";
     });
 
     yearSelect.addEventListener("change", () => {
-      const selectedYear = yearSelect.value;
-      if (selectedYear) {
-        rebuildMonthOptions(selectedYear);
-      }
+      const selectedYear = parseInt(yearSelect.value);
+      if (selectedYear) rebuildMonthOptions(selectedYear);
     });
 
     monthSelect.addEventListener("change", applyFilters);
     yearSelect.addEventListener("change", applyFilters);
   </script>
 
-  <!-- Load main dashboard logic -->
+  <!-- Main dashboard logic -->
   <script src="dashboard.js"></script>
 </body>
 </html>
