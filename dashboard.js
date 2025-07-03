@@ -111,22 +111,22 @@ function formatBillingPeriod() {
   const month = document.getElementById("month-select").value;
   const year = document.getElementById("year-select").value;
 
-  const selectedDate = new Date(`${year}-${month}-01`);
+  let correctedYear = parseInt(year);
+  if (parseInt(month) < 4) correctedYear += 1;
+
+  const selectedDate = new Date(`${correctedYear}-${month}-01`);
   const currentDate = new Date();
   const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
   const currentYear = String(currentDate.getFullYear());
 
-  const isLive = (month === currentMonth && year === currentYear);
+  const isLive = (month === currentMonth && correctedYear.toString() === currentYear);
   const monthName = selectedDate.toLocaleString("default", { month: "long" });
 
-  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${year}${isLive ? ' (LIVE)' : ''}`;
+  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}${isLive ? ' (LIVE)' : ''}`;
 
-  console.log("📆 Billing period label:", billingText); // 🔍 Debugging line
-
+  console.log("📆 Billing period label:", billingText);
   document.getElementById("billing-period").textContent = billingText;
 }
-
-
 
 function extractISTDateParts(isoDate) {
   const dtf = new Intl.DateTimeFormat("en-GB", {
@@ -323,6 +323,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
