@@ -7,9 +7,10 @@
   <link rel="stylesheet" href="styles.css?v=4" />
   <script>
  if (!localStorage.getItem("gmmcoLoggedIn")) {
-  window.location.href = "login.html";
-    }
+window.location.href = "login.html";
+  }
   </script>
+
 </head>
 <body>
   <header>
@@ -18,36 +19,27 @@
     <div class="user-profile" id="user-profile">
       <img src="images/gmmcocat.png" alt="User Icon" class="logo" />
     </div>
-    <hr>
+    <hr />
   </header>
+
   <main>
-    <div class="live-period-container">
-      <div id="billing-period" class="billing-period">LIVE BILLING PERIOD: June 2025</div>
-    </div>
+   <div class="live-period-container">
+  <div id="billing-period" class="">Loading...</div>
+</div>
+
+
     <section class="filter-container">
       <div class="filter-right">
         <label for="month-select">Month:</label>
-        <select id="month-select">
-          <option value="">--Select Month--</option>
-          <option value="01">January</option>
-          <option value="02">February</option>
-          <option value="03">March</option>
-          <option value="04">April</option>
-          <option value="05">May</option>
-          <option value="06">June</option>
-          <option value="07">July</option>
-          <option value="08">August</option>
-          <option value="09">September</option>
-          <option value="10">October</option>
-          <option value="11">November</option>
-          <option value="12">December</option>
-        </select>
+        <select id="month-select"></select>
+
         <label for="year-select">Year:</label>
         <select id="year-select">
           <option value="">--Select Year--</option>
-         <option value="2024">FY 2024 </option>
-         <option value="2025">FY 2025 </option>
+          <option value="2024">FY 2024</option>
+          <option value="2025">FY 2025</option>
         </select>
+
         <label for="group-select">Group:</label>
         <select id="group-select">
           <option value="">All</option>
@@ -55,9 +47,9 @@
           <option value="GCI">GCI</option>
           <option value="SEM">SEM</option>
         </select>
-        <button onclick="applyFilters()">Apply</button>
       </div>
     </section>
+
     <table id="sales-table">
       <thead>
         <tr>
@@ -85,103 +77,89 @@
       </tfoot>
     </table>
   </main>
+
   <footer>
     <hr />
     &copy; 2025 GMMCO CI Sales Dashboard - Live
     <hr />
   </footer>
+
+  <!-- Month & Year dropdown setup logic -->
   <script>
-  const monthSelect = document.getElementById("month-select");
-  const yearSelect = document.getElementById("year-select");
+    const monthSelect = document.getElementById("month-select");
+    const yearSelect = document.getElementById("year-select");
 
-  const months = [
-    { value: "04", name: "April" },
-    { value: "05", name: "May" },
-    { value: "06", name: "June" },
-    { value: "07", name: "July" },
-    { value: "08", name: "August" },
-    { value: "09", name: "September" },
-    { value: "10", name: "October" },
-    { value: "11", name: "November" },
-    { value: "12", name: "December" },
-    { value: "01", name: "January" },
-    { value: "02", name: "February" },
-    { value: "03", name: "March" }
-  ];
+    const months = [
+      { value: "04", name: "April" },
+      { value: "05", name: "May" },
+      { value: "06", name: "June" },
+      { value: "07", name: "July" },
+      { value: "08", name: "August" },
+      { value: "09", name: "September" },
+      { value: "10", name: "October" },
+      { value: "11", name: "November" },
+      { value: "12", name: "December" },
+      { value: "01", name: "January" },
+      { value: "02", name: "February" },
+      { value: "03", name: "March" }
+    ];
 
-  function rebuildMonthOptions(financialYear) {
-    monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
-    months.forEach((month) => {
-      const labelYear = parseInt(month.value) < 4 
-        ? parseInt(financialYear) + 1 
-        : parseInt(financialYear);
-      const option = document.createElement("option");
-      option.value = month.value;
-      option.textContent = `${month.name} ${labelYear}`;
-      monthSelect.appendChild(option);
-    });
-  }
-
-  yearSelect.addEventListener("change", () => {
-    const selectedYear = yearSelect.value;
-    if (selectedYear) {
-      rebuildMonthOptions(selectedYear);
+    function rebuildMonthOptions(financialYear) {
+      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
+      months.forEach((month) => {
+        const labelYear = parseInt(month.value) < 4 
+          ? parseInt(financialYear) + 1 
+          : parseInt(financialYear);
+        const option = document.createElement("option");
+        option.value = month.value;
+        option.textContent = `${month.name} ${labelYear}`;
+        monthSelect.appendChild(option);
+      });
     }
-  });
 
-  function getMonthName(monthValue) {
-    const match = months.find((m) => m.value === monthValue);
-    return match ? match.name : "";
-  }
+    function applyFilters() {
+      const selectedYear = yearSelect.value;
+      const selectedMonth = monthSelect.value;
+      const selectedGroup = document.getElementById("group-select").value;
 
-  function applyFilters() {
-    const selectedYear = yearSelect.value;
-    const selectedMonth = monthSelect.value;
-    const selectedGroup = document.getElementById("group-select").value;
+      if (!selectedYear || !selectedMonth) return;
 
-    if (!selectedYear || !selectedMonth) return;
+      console.log("Filters applied manually:", {
+        year: selectedYear,
+        month: selectedMonth,
+        group: selectedGroup
+      });
 
-    const displayYear = ["01", "02", "03"].includes(selectedMonth)
-      ? parseInt(selectedYear) + 1
-      : parseInt(selectedYear);
+      // dashboard.js handles billing period update
+    }
 
-    const billingPeriod = `${getMonthName(selectedMonth)} ${displayYear}`;
-    document.getElementById("billing-period").textContent = `LIVE BILLING PERIOD: ${billingPeriod}`;
+    // Initialize dropdowns on page load
+    window.addEventListener("DOMContentLoaded", () => {
+      const today = new Date();
+      const thisMonth = today.getMonth() + 1;
+      const thisYear = today.getFullYear();
 
-    console.log("Filters:", {
-      year: selectedYear,
-      month: selectedMonth,
-      financialYear: selectedYear,
-      calendarYear: displayYear,
-      group: selectedGroup
+      const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
+      yearSelect.value = fy.toString();
+      rebuildMonthOptions(fy);
+
+      const monthValue = String(thisMonth).padStart(2, "0");
+      monthSelect.value = monthValue;
     });
-  }
 
-  // ✅ Default selection on page load
-  window.addEventListener("DOMContentLoaded", () => {
-    const today = new Date();
-    const thisMonth = today.getMonth() + 1;
-    const thisYear = today.getFullYear();
+    yearSelect.addEventListener("change", () => {
+      const selectedYear = yearSelect.value;
+      if (selectedYear) {
+        rebuildMonthOptions(selectedYear);
+      }
+    });
 
-    // Calculate financial year
-    const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
-    yearSelect.value = fy.toString();
+    monthSelect.addEventListener("change", applyFilters);
+    yearSelect.addEventListener("change", applyFilters);
+  </script>
 
-    rebuildMonthOptions(fy);
-
-    // Set month value
-    const monthValue = String(thisMonth).padStart(2, "0");
-    monthSelect.value = monthValue;
-
-    // Set LIVE BILLING PERIOD
-    const displayYear = ["01", "02", "03"].includes(monthValue)
-      ? fy + 1
-      : fy;
-    const billingPeriod = `${getMonthName(monthValue)} ${displayYear}`;
-    document.getElementById("billing-period").textContent = `LIVE BILLING PERIOD: ${billingPeriod}`;
-  });
-</script>
- <script src="dashboard.js"></script>
+  <!-- Load main dashboard logic -->
+  <script src="dashboard.js"></script>
 </body>
 </html>
 
