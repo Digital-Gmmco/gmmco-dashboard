@@ -57,8 +57,6 @@ const products = [
   { model: "120ng", group: "GCI" }, { model: "992k", group: "GCI" }
 ];
 
-// The rest of your code follows unchanged from the previous update, with division filtering already included.
-
 const skipKeywords = [
   "eind230c9.3", "c9.3b", "af220", "one time eq for iims", "966h",
   "ayw00562", "trans 966h", "939:aa", "crt 5633", "crt5633", "sps855", "c9",
@@ -110,11 +108,25 @@ function getDefaultMonthYear() {
 }
 
 function formatBillingPeriod() {
-  const today = new Date();
-  const billingMonth = today.toLocaleString("default", { month: "long" });
-  const billingYear = today.getFullYear();
-  document.getElementById("billing-period").textContent = `Live Billing Period: ${billingMonth} ${billingYear}`;
+  const month = document.getElementById("month-select").value;
+  const year = document.getElementById("year-select").value;
+
+  const selectedDate = new Date(`${year}-${month}-01`);
+  const currentDate = new Date();
+  const currentMonth = String(currentDate.getMonth() + 1).padStart(2, "0");
+  const currentYear = String(currentDate.getFullYear());
+
+  const isLive = (month === currentMonth && year === currentYear);
+  const monthName = selectedDate.toLocaleString("default", { month: "long" });
+
+  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${year}${isLive ? ' (LIVE)' : ''}`;
+
+  console.log("📆 Billing period label:", billingText); // 🔍 Debugging line
+
+  document.getElementById("billing-period").textContent = billingText;
 }
+
+
 
 function extractISTDateParts(isoDate) {
   const dtf = new Intl.DateTimeFormat("en-GB", {
@@ -134,7 +146,6 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
- 
 let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
 //let url = "https://uat.gmmco.in/gmmco-api/get-asset-report?v=" + Date.now();
 
@@ -146,9 +157,13 @@ let url = "https://uat.gmmco.in/gmmco-api/get-asset-report";
 
   if (params.toString()) url += `?${params.toString()}`;
 
-  fetch(url)
-    .then(res => res.json())
-    .then(data => processAndRenderData(data))
+ fetch(url)
+  .then(res => res.json())
+  .then(data => {
+    formatBillingPeriod(); // ← Moved here after data is fetched
+    processAndRenderData(data);
+  })
+
     .catch(err => {
       console.error("❌ Error fetching filtered data:", err);
       document.getElementById("sales-body").innerHTML = `<tr><td colspan='7' style='color:red;'>❌ Failed to load filtered data</td></tr>`;
@@ -308,5 +323,6 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
