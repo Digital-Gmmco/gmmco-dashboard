@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="styles.css?v=4" />
   <script>
  if (!localStorage.getItem("gmmcoLoggedIn")) {
-   window.location.href = "login.html";
+  window.location.href = "login.html";
     }
   </script>
 </head>
@@ -47,10 +47,6 @@
           <option value="">--Select Year--</option>
           <option value="2025">2025</option>
           <option value="2024">2024</option>
-          <option value="2023">2023</option>
-          <option value="2022">2022</option>
-          <option value="2021">2021</option>
-          <option value="2020">2020</option>
         </select>
         <label for="group-select">Group:</label>
         <select id="group-select">
@@ -94,6 +90,51 @@
     &copy; 2025 GMMCO CI Sales Dashboard - Live
     <hr />
   </footer>
+  <script>
+  const monthSelect = document.getElementById("month-select");
+  const yearSelect = document.getElementById("year-select");
+
+  yearSelect.addEventListener("change", () => {
+    const selectedYear = yearSelect.value;
+    const monthOptions = monthSelect.querySelectorAll("option");
+
+    monthOptions.forEach((opt, index) => {
+      if (index === 0) return; // "--Select Month--" option
+      const monthValue = parseInt(opt.value);
+      if (selectedYear === "2024" && monthValue < 4) {
+        opt.style.display = "none";
+      } else {
+        opt.style.display = "block";
+      }
+    });
+
+    // If currently selected month is Jan–Mar while 2024 is selected, reset
+    const currentMonth = parseInt(monthSelect.value);
+    if (selectedYear === "2024" && currentMonth < 4) {
+      monthSelect.value = "";
+    }
+  });
+
+  function applyFilters() {
+    const selectedYear = yearSelect.value;
+    const selectedMonth = monthSelect.value;
+
+    if (selectedYear === "2024" && ["01", "02", "03"].includes(selectedMonth)) {
+      alert("Data for Jan, Feb, and Mar 2024 is not available.");
+      return;
+    }
+
+    // Your filtering logic here
+    console.log("Filters applied:", {
+      year: selectedYear,
+      month: selectedMonth,
+      group: document.getElementById("group-select").value
+    });
+
+    // TODO: Add actual fetch/filter/render logic here if not already in dashboard.js
+  }
+</script>
+
  <script src="dashboard.js"></script>
 </body>
 </html>
