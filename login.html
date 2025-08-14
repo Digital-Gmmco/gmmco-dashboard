@@ -127,8 +127,8 @@
         const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
         const userEmail = loginResponse.account.username.toLowerCase();
         if (allowedEmails.includes(userEmail)) {
-         sessionStorage.setItem("gmmcoLoggedIn", "true");
-sessionStorage.setItem("gmmcoEmail", userEmail);
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
           window.location.href = "/gmmco-dashboard/index.html";
         } else {
           alert("Access denied: Your account is not authorized to access this dashboard.");
@@ -143,3 +143,4 @@ sessionStorage.setItem("gmmcoEmail", userEmail);
 </body>
 
 </html> 
+
