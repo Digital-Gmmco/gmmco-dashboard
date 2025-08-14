@@ -132,7 +132,9 @@
           window.location.href = "/gmmco-dashboard/index.html";
         } else {
           alert("Access denied: Your account is not authorized to access this dashboard.");
-          window.location.href = "/gmmco-dashboard/access-denied.html";
+          setTimeout(() => {
+            window.close();
+          }, 5000);
         }
       } catch (error) {
         console.error(error);
@@ -143,4 +145,5 @@
 </body>
 
 </html> 
+
 
