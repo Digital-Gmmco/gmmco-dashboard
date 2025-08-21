@@ -101,27 +101,27 @@
     }
 
     async function loginWithAzure() {
-      try {
-        // On mobile, always use redirect
-        if (/Mobi|Android/i.test(navigator.userAgent)) {
-          await msalInstance.loginRedirect({ scopes:["User.Read"] });
-          return;
-        }
-        // On desktop, use popup
+    try {
+      if (/Mobi|Android/i.test(navigator.userAgent)) {
+        await msalInstance.loginRedirect({ scopes:["User.Read"] });
+      } else {
         const resp = await msalInstance.loginPopup({ scopes:["User.Read"] });
-        const email = resp.account.username.toLowerCase();
-        if (allowedEmails.includes(email)) {
-          sessionStorage.setItem("gmmcoLoggedIn","true");
-          sessionStorage.setItem("gmmcoEmail",email);
-          window.location.href="/ci-dashboard/index.html";
-        } else {
-          alert("Access denied");
-        }
-      } catch (err) {
-        alert("Login failed: "+err.message);
-        console.error(err);
+        processAccount(resp.account);
       }
+    } catch (err) {
+      alert("Login failed: " + err.message);
     }
+  }
+
+  function processAccount(account){
+    const email = account.username.toLowerCase();
+    if (allowedEmails.includes(email)) {
+      window.location.href="/ci-dashboard/index.html";
+    } else {
+      alert("Access denied: " + email);
+    }
+  }
   </script>
 </body>
 </html>
+
