@@ -7,11 +7,6 @@
   <link rel="icon" type="image/png" href="images/gmmcoG.png">
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
   <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
     body {
       font-family: "Segoe UI", sans-serif;
       background: url('images/loginpage.png') no-repeat center center fixed;
@@ -22,22 +17,10 @@
       align-items: center;
       position: relative;
     }
-    .logo-top-left,
-    .logo-top-right {
-      position: absolute;
-      top: 20px;
-    }
-    .logo-top-left {
-      left: 20px;
-    }
-    .logo-top-right {
-      right: 20px;
-    }
-    .logo-top-left img,
-    .logo-top-right img {
-      height: 50px;
-      width: auto;
-    }
+    .logo-top-left, .logo-top-right { position: absolute; top: 20px; }
+    .logo-top-left { left: 20px; }
+    .logo-top-right { right: 20px; }
+    .logo-top-left img, .logo-top-right img { height: 50px; }
     .login-card {
       background: rgba(255, 255, 255, 0.95);
       padding: 40px 30px;
@@ -64,44 +47,36 @@
       font-weight: bold;
       border-radius: 8px;
       cursor: pointer;
-      transition: all 0.3s ease;
       font-size: 14px;
       width: 100%;
     }
     .sso-button:hover {
       background: linear-gradient(to right, #0058a3, #1a1a60);
     }
-    .footer {
-      margin-top: 20px;
-      font-size: 12px;
-      color: #555;
-    }
+    .footer { margin-top: 20px; font-size: 12px; color: #555; }
   </style>
 </head>
 <body>
-  <!-- Logo in the top-left corner -->
-  <div class="logo-top-left">
-    <img src="images/gmmco-logo.png" alt="GMMCO Logo">
-  </div>
-  <!-- New logo in the top-right corner -->
-  <div class="logo-top-right">
-    <img src="images/gmmcocat.png" alt="GMMCO CAT Logo">
-  </div>
+  <!-- Logos -->
+  <div class="logo-top-left"><img src="images/gmmco-logo.png" alt="GMMCO Logo"></div>
+  <div class="logo-top-right"><img src="images/gmmcocat.png" alt="GMMCO CAT Logo"></div>
+
   <div class="login-card">
     <h2>GMMCO CI Dashboard Login</h2>
     <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
     <div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
   </div>
+
   <script>
     const msalConfig = {
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
-        //knownAuthorities:["uat.gmmco.in"],
+        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/login.html"  // stays login.html
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
+
     const allowedEmails = [
       "arunprasad.r@gmmcoindia.com",
       "meenakshi.v@gmmcoindia.com",
@@ -122,25 +97,44 @@
       "user19@gmmco.in",
       "user20@gmmco.in"
     ];
-   async function loginWithAzure() {
-    try {
-      await msalInstance.loginRedirect({ scopes: ["User.Read"] });
-    } catch (error) {
-      console.error(error);
-      alert("Azure login failed: " + error.message);
+
+    // Trigger login
+    async function loginWithAzure() {
+      try {
+        await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+      } catch (error) {
+        console.error(error);
+        alert("Azure login failed: " + error.message);
+      }
     }
-  }
+
+    // Handle redirect from Azure
+    msalInstance.handleRedirectPromise().then(response => {
+      let account = null;
+      if (response && response.account) {
+        account = response.account;
+      } else {
+        const accounts = msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+          account = accounts[0];
+        }
+      }
+
+      if (account) {
+        const userEmail = account.username.toLowerCase();
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          // ✅ Redirect to dashboard after login
+          window.location.href = "/ci-dashboard/index.html";
+        } else {
+          alert("Access denied: Your account is not authorized.");
+          localStorage.clear();
+        }
+      }
+    }).catch(error => {
+      console.error("Redirect handling error:", error);
+    });
   </script>
 </body>
 </html>
-
-
-  
-
-
-
-
-
-
-
-
