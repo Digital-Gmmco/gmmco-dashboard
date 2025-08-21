@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=6" />
+  <link rel="stylesheet" href="styles.css?v=7" />
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
@@ -86,7 +86,7 @@
   </footer>
 
   <script>
-    // 🔑 MSAL Config (must match Azure registered redirect: index.html)
+    // MSAL Config
     const msalConfig = {
       auth: {
         clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
@@ -96,7 +96,7 @@
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-    // ✅ Allowed users
+    // Allowed users
     const allowedEmails = [
       "arunprasad.r@gmmcoindia.com",
       "meenakshi.v@gmmcoindia.com",
@@ -118,7 +118,7 @@
       "user20@gmmco.in"
     ];
 
-    // 🚀 Handle login redirect from Azure
+    // Handle Azure login redirect
     msalInstance.handleRedirectPromise().then(response => {
       let account = null;
 
@@ -143,92 +143,25 @@
           window.location.href = "/ci-dashboard/login.html";
         }
       } else {
-        // Not logged in → go back to login
-        window.location.href = "/ci-dashboard/login.html";
+        // ⚠️ Only send back to login if no previous login in storage
+        if (!localStorage.getItem("gmmcoLoggedIn")) {
+          window.location.href = "/ci-dashboard/login.html";
+        }
       }
     }).catch(error => {
       console.error("Redirect handling error:", error);
-      window.location.href = "/ci-dashboard/login.html";
+      if (!localStorage.getItem("gmmcoLoggedIn")) {
+        window.location.href = "/ci-dashboard/login.html";
+      }
     });
 
-    // 🚪 Logout handler
+    // Logout
     document.getElementById("logout-btn").addEventListener("click", () => {
       localStorage.clear();
       msalInstance.logoutRedirect({ postLogoutRedirectUri: "/ci-dashboard/login.html" });
     });
   </script>
 
-  <!-- Month & Year dropdown setup logic -->
-  <script>
-    const monthSelect = document.getElementById("month-select");
-    const yearSelect = document.getElementById("year-select");
-
-    const months = [
-      { value: "04", name: "April" },
-      { value: "05", name: "May" },
-      { value: "06", name: "June" },
-      { value: "07", name: "July" },
-      { value: "08", name: "August" },
-      { value: "09", name: "September" },
-      { value: "10", name: "October" },
-      { value: "11", name: "November" },
-      { value: "12", name: "December" },
-      { value: "01", name: "January" },
-      { value: "02", name: "February" },
-      { value: "03", name: "March" }
-    ];
-
-    function rebuildMonthOptions(financialYear) {
-      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
-      months.forEach((month) => {
-        const actualYear = parseInt(month.value) < 4 
-          ? parseInt(financialYear) + 1 
-          : parseInt(financialYear);
-
-        const option = document.createElement("option");
-        option.value = month.value;
-        option.textContent = `${month.name} ${actualYear}`;
-        monthSelect.appendChild(option);
-      });
-    }
-
-    function applyFilters() {
-      const selectedYear = yearSelect.value;
-      const selectedMonth = monthSelect.value;
-      const selectedGroup = document.getElementById("group-select").value;
-
-      if (!selectedYear || !selectedMonth) return;
-
-      console.log("Filters applied:", {
-        year: selectedYear,
-        month: selectedMonth,
-        group: selectedGroup
-      });
-    }
-
-    window.addEventListener("DOMContentLoaded", () => {
-      const today = new Date();
-      const thisMonth = today.getMonth() + 1;
-      const thisYear = today.getFullYear();
-
-      const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
-      yearSelect.value = fy.toString();
-      rebuildMonthOptions(fy);
-
-      const monthValue = String(thisMonth).padStart(2, "0");
-      monthSelect.value = monthValue;
-    });
-
-    yearSelect.addEventListener("change", () => {
-      const selectedYear = parseInt(yearSelect.value);
-      if (selectedYear) rebuildMonthOptions(selectedYear);
-    });
-
-    monthSelect.addEventListener("change", applyFilters);
-    yearSelect.addEventListener("change", applyFilters);
-  </script>
-
-  <!-- Dashboard logic -->
   <script src="dashboard.js"></script>
 </body>
 </html>
