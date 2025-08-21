@@ -57,9 +57,11 @@
   </style>
 </head>
 <body>
+  <!-- Logos -->
   <div class="logo-top-left"><img src="images/gmmco-logo.png" alt="GMMCO Logo"></div>
   <div class="logo-top-right"><img src="images/gmmcocat.png" alt="GMMCO CAT Logo"></div>
 
+  <!-- Login Card -->
   <div class="login-card">
     <h2>GMMCO CI Dashboard Login</h2>
     <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
@@ -67,15 +69,17 @@
   </div>
 
   <script>
+    // 🔑 MSAL Config
     const msalConfig = {
       auth: {
-        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html" // ✅ Use index.html
+        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/login.html" // ⚠️ keep login.html (since Azure is fixed)
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
+    // 🚀 Trigger login
     async function loginWithAzure() {
       try {
         await msalInstance.loginRedirect({ scopes: ["User.Read"] });
@@ -84,6 +88,35 @@
         alert("Azure login failed: " + error.message);
       }
     }
+
+    // ✅ Handle redirect from Azure
+    msalInstance.handleRedirectPromise().then(response => {
+      let account = null;
+
+      if (response && response.account) {
+        account = response.account;
+      } else {
+        const accounts = msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+          account = accounts[0];
+        }
+      }
+
+      if (account) {
+        const userEmail = account.username.toLowerCase();
+
+        // Save to localStorage
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", userEmail);
+
+        console.log("✅ Logged in as:", userEmail);
+
+        // 🚀 Immediately forward to dashboard
+        window.location.href = "/ci-dashboard/index.html";
+      }
+    }).catch(error => {
+      console.error("Redirect handling error:", error);
+    });
   </script>
 </body>
 </html>
