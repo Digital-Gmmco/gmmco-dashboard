@@ -101,6 +101,26 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
+    // ✅ Handle redirect response (mobile flow)
+    msalInstance.handleRedirectPromise().then((response) => {
+      if (response && response.account) {
+        const userEmail = response.account.username.toLowerCase();
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          document.querySelector(".user-profile").title = userEmail;
+          console.log("✅ Redirect login success:", userEmail);
+        } else {
+          alert("Access denied.");
+          localStorage.clear();
+          window.location.href = "/ci-dashboard/login.html";
+        }
+      } else {
+        ensureLoggedIn();
+      }
+    });
+
+    // ✅ Check session
     function ensureLoggedIn() {
       const accounts = msalInstance.getAllAccounts();
       if (accounts.length > 0) {
@@ -109,27 +129,15 @@
           localStorage.setItem("gmmcoLoggedIn", "true");
           localStorage.setItem("gmmcoEmail", userEmail);
           document.querySelector(".user-profile").title = userEmail;
-          console.log("✅ Dashboard loaded for:", userEmail);
           return;
-        } else {
-          alert("Access denied.");
-          localStorage.clear();
-          msalInstance.logoutPopup();
-          window.location.href = "/ci-dashboard/login.html";
-        }
-      } else {
-        // fallback localStorage check
-        const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
-        const userEmail = localStorage.getItem("gmmcoEmail");
-        if (!isLoggedIn || !userEmail) {
-          window.location.href = "/ci-dashboard/login.html";
-        } else {
-          document.querySelector(".user-profile").title = userEmail;
         }
       }
+      const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
+      const userEmail = localStorage.getItem("gmmcoEmail");
+      if (!isLoggedIn || !userEmail) {
+        window.location.href = "/ci-dashboard/login.html";
+      }
     }
-
-    ensureLoggedIn();
   </script>
 
   <!-- ✅ Month/Year Dropdown Fix -->
@@ -138,20 +146,16 @@
     const yearSelect = document.getElementById("year-select");
 
     const months = [
-      { value: "04", name: "April" },{ value: "05", name: "May" },
-      { value: "06", name: "June" }, { value: "07", name: "July" },
-      { value: "08", name: "August" },{ value: "09", name: "September" },
-      { value: "10", name: "October" },{ value: "11", name: "November" },
-      { value: "12", name: "December" },{ value: "01", name: "January" },
-      { value: "02", name: "February" },{ value: "03", name: "March" }
+      { value: "04", name: "April" },{ value: "05", name: "May" },{ value: "06", name: "June" },
+      { value: "07", name: "July" },{ value: "08", name: "August" },{ value: "09", name: "September" },
+      { value: "10", name: "October" },{ value: "11", name: "November" },{ value: "12", name: "December" },
+      { value: "01", name: "January" },{ value: "02", name: "February" },{ value: "03", name: "March" }
     ];
 
     function rebuildMonthOptions(financialYear) {
       monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
       months.forEach((month) => {
-        const actualYear = parseInt(month.value) < 4 
-          ? parseInt(financialYear) + 1 
-          : parseInt(financialYear);
+        const actualYear = parseInt(month.value) < 4 ? parseInt(financialYear) + 1 : parseInt(financialYear);
         const option = document.createElement("option");
         option.value = month.value;
         option.textContent = `${month.name} ${actualYear}`;
@@ -182,7 +186,6 @@
     });
   </script>
 
-  <!-- Dashboard logic -->
   <script src="dashboard.js"></script>
 </body>
 </html>
