@@ -71,7 +71,7 @@
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // not actually used in popup
+        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -85,7 +85,7 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    // ✅ Auto-restore session if MSAL already has an account
+    // ✅ Auto-redirect if already signed in
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length > 0) {
       const userEmail = accounts[0].username.toLowerCase();
@@ -114,7 +114,7 @@
         }
       } catch (error) {
         console.error(error);
-        alert("⚠️ Login failed. Please allow popups in your browser and try again.");
+        alert("⚠️ Login failed. Please allow popups and try again.");
       }
     }
   </script>
