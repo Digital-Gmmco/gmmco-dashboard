@@ -6,7 +6,7 @@ const path = require('path');
 const readline = require('readline');
 
 const app = express();
-const PORT = 3000;
+const PORT = 3003;
 
 // CORS setup for local development
 app.use(cors({
@@ -103,4 +103,5 @@ app.get('/get-asset-report', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`🚀 Server running at http://localhost:${PORT}`);
 });
+
 
