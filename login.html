@@ -71,7 +71,7 @@
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html"
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -85,36 +85,29 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    // ✅ Auto-redirect if already signed in
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      const userEmail = accounts[0].username.toLowerCase();
-      if (allowedEmails.includes(userEmail)) {
-        localStorage.setItem("gmmcoLoggedIn", "true");
-        localStorage.setItem("gmmcoEmail", userEmail);
-        window.location.href = "/ci-dashboard/index.html";
-      } else {
-        localStorage.clear();
-      }
-    }
-
     async function loginWithAzure() {
       try {
-        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-        const account = response.account;
-        const userEmail = account.username.toLowerCase();
-
-        if (allowedEmails.includes(userEmail)) {
-          localStorage.setItem("gmmcoLoggedIn", "true");
-          localStorage.setItem("gmmcoEmail", userEmail);
-          window.location.href = "/ci-dashboard/index.html";
+        const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+        if (isMobile) {
+          // ✅ Use redirect for mobile
+          await msalInstance.loginRedirect({ scopes: ["User.Read"] });
         } else {
-          alert("Access denied: Your account is not authorized.");
-          localStorage.clear();
+          // ✅ Use popup for desktop
+          const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+          const account = response.account;
+          const userEmail = account.username.toLowerCase();
+          if (allowedEmails.includes(userEmail)) {
+            localStorage.setItem("gmmcoLoggedIn", "true");
+            localStorage.setItem("gmmcoEmail", userEmail);
+            window.location.href = "/ci-dashboard/index.html";
+          } else {
+            alert("Access denied: Your account is not authorized.");
+            localStorage.clear();
+          }
         }
       } catch (error) {
         console.error(error);
-        alert("⚠️ Login failed. Please allow popups and try again.");
+        alert("⚠️ Login failed. Please try again.");
       }
     }
   </script>
