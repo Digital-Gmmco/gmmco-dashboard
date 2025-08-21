@@ -71,31 +71,32 @@
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // popup doesn’t actually use this
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // not actually used in popup
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
     const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com",
-      "meenakshi.v@gmmcoindia.com",
-      "priyadharshini.m@gmmcoindia.com",
-      "hpramod@gmmcoindia.com",
-      "rahul.s@gmmcoindia.com",
-      "chandrashekar.v@gmmcoindia.com",
-      "shahid@gmmcoindia.com",
-      "manikandan.g@gmmcoindia.com",
-      "jrajkumar@gmmcoindia.com",
-      "karansingh.r@gmmcoindia.com",
-      "josephmartin@gmmcoindia.com",
-      "sameer.w@gmmcoindia.com",
-      "anshajsingh.a@gmmcoindia.com",
-      "kumaresan.p@gmmcoindia.com",
-      "presely.a@gmmcoindia.com",
-      "user18@gmmco.in",
-      "user19@gmmco.in",
-      "user20@gmmco.in"
+      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
+      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
+      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
+      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
+      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
+
+    // ✅ Auto-restore session if MSAL already has an account
+    const accounts = msalInstance.getAllAccounts();
+    if (accounts.length > 0) {
+      const userEmail = accounts[0].username.toLowerCase();
+      if (allowedEmails.includes(userEmail)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", userEmail);
+        window.location.href = "/ci-dashboard/index.html";
+      } else {
+        localStorage.clear();
+      }
+    }
 
     async function loginWithAzure() {
       try {
@@ -113,10 +114,9 @@
         }
       } catch (error) {
         console.error(error);
-        alert("Azure login failed: " + error.message);
+        alert("⚠️ Login failed. Please allow popups in your browser and try again.");
       }
     }
   </script>
 </body>
 </html>
-
