@@ -97,8 +97,8 @@
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://uat.gmmco.in/gmmco-dashboard/index.html",
-        knownAuthorities:["uat.gmmco.in"],
+        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
+        //knownAuthorities:["uat.gmmco.in"],
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -116,7 +116,7 @@
       "josephmartin@gmmcoindia.com",
       "sameer.w@gmmcoindia.com",
       "anshajsingh.a@gmmcoindia.com",
-      "user16@gmmco.in",
+      "kumaresan.p@gmmcoindia.com",
       "user17@gmmco.in",
       "user18@gmmco.in",
       "user19@gmmco.in",
@@ -129,7 +129,7 @@
         if (allowedEmails.includes(userEmail)) {
           localStorage.setItem("gmmcoLoggedIn", "true");
           localStorage.setItem("gmmcoEmail", userEmail);
-          window.location.href = "/gmmco-dashboard/index.html";
+          window.location.href = "/ci-dashboard/index.html";
         } else {
           alert("Access denied: Your account is not authorized to access this dashboard.");
           setTimeout(() => {
@@ -145,5 +145,6 @@
 </body>
 
 </html> 
+
 
 
