@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=5" />
+  <link rel="stylesheet" href="styles.css?v=6" />
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
@@ -86,15 +86,17 @@
   </footer>
 
   <script>
+    // 🔑 MSAL Config (must match Azure registered redirect: index.html)
     const msalConfig = {
       auth: {
-        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
+        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html"
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
+    // ✅ Allowed users
     const allowedEmails = [
       "arunprasad.r@gmmcoindia.com",
       "meenakshi.v@gmmcoindia.com",
@@ -116,7 +118,7 @@
       "user20@gmmco.in"
     ];
 
-    // 🚀 Handle login/redirect
+    // 🚀 Handle login redirect from Azure
     msalInstance.handleRedirectPromise().then(response => {
       let account = null;
 
@@ -141,7 +143,7 @@
           window.location.href = "/ci-dashboard/login.html";
         }
       } else {
-        // Not logged in → send to login
+        // Not logged in → go back to login
         window.location.href = "/ci-dashboard/login.html";
       }
     }).catch(error => {
