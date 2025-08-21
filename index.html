@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=12" />
+  <link rel="stylesheet" href="styles.css?v=13" />
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
@@ -18,7 +18,7 @@
   </header>
 
   <main>
-    <!-- same filters + table as before -->
+    <!-- filters + table same as before -->
   </main>
 
   <footer>
@@ -33,48 +33,50 @@
         redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
       },
       cache: {
-        cacheLocation: "sessionStorage",
-        storeAuthStateInCookie: true
+        cacheLocation:"sessionStorage",
+        storeAuthStateInCookie:true
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-    const allowedEmails = [/* same as login.html */];
+    const allowedEmails = [
+      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
+      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
+      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
+      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
+      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
+    ];
 
-    msalInstance.handleRedirectPromise().then((resp) => {
+    // Handle redirect login result first
+    msalInstance.handleRedirectPromise().then(resp => {
       if (resp && resp.account) {
-        const email = resp.account.username.toLowerCase();
-        if (allowedEmails.includes(email)) {
-          sessionStorage.setItem("gmmcoLoggedIn","true");
-          sessionStorage.setItem("gmmcoEmail",email);
-          document.querySelector(".user-profile").title=email;
-        } else {
-          alert("Access denied");
-          sessionStorage.clear();
-          window.location.href="/ci-dashboard/login.html";
-        }
+        processAccount(resp.account);
       } else {
-        checkSession();
+        checkExistingAccount();
       }
-    }).catch(err=>{
-      console.error("Redirect err",err);
-      sessionStorage.clear();
-      window.location.href="/ci-dashboard/login.html";
+    }).catch(err => {
+      console.error("Redirect error", err);
+      window.location.href = "/ci-dashboard/login.html";
     });
 
-    function checkSession(){
-      const accounts=msalInstance.getAllAccounts();
-      if(accounts.length>0){
-        const email=accounts[0].username.toLowerCase();
-        if(allowedEmails.includes(email)){
-          sessionStorage.setItem("gmmcoLoggedIn","true");
-          sessionStorage.setItem("gmmcoEmail",email);
-          document.querySelector(".user-profile").title=email;
-          return;
-        }
+    function checkExistingAccount(){
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        processAccount(accounts[0]);
+      } else {
+        window.location.href = "/ci-dashboard/login.html";
       }
-      if(sessionStorage.getItem("gmmcoLoggedIn")!=="true"){
-        window.location.href="/ci-dashboard/login.html";
+    }
+
+    function processAccount(account){
+      const email = account.username.toLowerCase();
+      if (allowedEmails.includes(email)) {
+        document.querySelector(".user-profile").title = email;
+        console.log("✅ Logged in as", email);
+      } else {
+        alert("Access denied: " + email);
+        window.location.href = "/ci-dashboard/login.html";
       }
     }
   </script>
