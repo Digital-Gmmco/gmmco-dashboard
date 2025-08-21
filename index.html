@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=10" />
+  <link rel="stylesheet" href="styles.css?v=11" />
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
@@ -101,7 +101,7 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    // ✅ Handle redirect response (mobile flow)
+    // ✅ Handle redirect result FIRST before checking login
     msalInstance.handleRedirectPromise().then((response) => {
       if (response && response.account) {
         const userEmail = response.account.username.toLowerCase();
@@ -116,12 +116,15 @@
           window.location.href = "/ci-dashboard/login.html";
         }
       } else {
-        ensureLoggedIn();
+        checkExistingSession();
       }
+    }).catch(err => {
+      console.error("Redirect error:", err);
+      localStorage.clear();
+      window.location.href = "/ci-dashboard/login.html";
     });
 
-    // ✅ Check session
-    function ensureLoggedIn() {
+    function checkExistingSession() {
       const accounts = msalInstance.getAllAccounts();
       if (accounts.length > 0) {
         const userEmail = accounts[0].username.toLowerCase();
