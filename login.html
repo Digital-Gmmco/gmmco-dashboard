@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -71,11 +72,7 @@
       auth: {
         clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
         authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
-      },
-      cache: {
-        cacheLocation: "sessionStorage", // ✅ safer for mobile Safari
-        storeAuthStateInCookie: true
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // not actually used in popup
       }
     };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -89,38 +86,38 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    // auto-redirect if session already exists
+    // ✅ Auto-restore session if MSAL already has an account
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length > 0) {
-      const email = accounts[0].username.toLowerCase();
-      if (allowedEmails.includes(email)) {
-        sessionStorage.setItem("gmmcoLoggedIn","true");
-        sessionStorage.setItem("gmmcoEmail",email);
-        window.location.href="/ci-dashboard/index.html";
+      const userEmail = accounts[0].username.toLowerCase();
+      if (allowedEmails.includes(userEmail)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", userEmail);
+        window.location.href = "/ci-dashboard/index.html";
+      } else {
+        localStorage.clear();
       }
     }
 
     async function loginWithAzure() {
-    try {
-      if (/Mobi|Android/i.test(navigator.userAgent)) {
-        await msalInstance.loginRedirect({ scopes:["User.Read"] });
-      } else {
-        const resp = await msalInstance.loginPopup({ scopes:["User.Read"] });
-        processAccount(resp.account);
-      }
-    } catch (err) {
-      alert("Login failed: " + err.message);
-    }
-  }
+      try {
+        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+        const account = response.account;
+        const userEmail = account.username.toLowerCase();
 
-  function processAccount(account){
-    const email = account.username.toLowerCase();
-    if (allowedEmails.includes(email)) {
-      window.location.href="/ci-dashboard/index.html";
-    } else {
-      alert("Access denied: " + email);
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          window.location.href = "/ci-dashboard/index.html";
+        } else {
+          alert("Access denied: Your account is not authorized.");
+          localStorage.clear();
+        }
+      } catch (error) {
+        console.error(error);
+        alert("⚠️ Login failed. Please allow popups in your browser and try again.");
+      }
     }
-  }
   </script>
 </body>
 </html>
