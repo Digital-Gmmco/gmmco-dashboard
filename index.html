@@ -13,9 +13,6 @@
     <div class="user-profile" id="user-profile">
       <img src="images/gmmcocat.png" alt="User Icon" class="logo" />
     </div>
-    <button id="logout-btn" style="margin-left:20px; padding:6px 12px; border:none; border-radius:6px; background:#c62828; color:#fff; cursor:pointer;">
-      Logout
-    </button>
     <hr />
   </header>
 
@@ -96,12 +93,6 @@
       console.log("✅ Dashboard loaded for:", userEmail);
       document.querySelector(".user-profile").title = userEmail;
     }
-
-    // 🚪 Logout
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      localStorage.clear();
-      window.location.href = "/ci-dashboard/login.html";
-    });
   </script>
 
   <!-- ✅ Month/Year Dropdown Fix -->
