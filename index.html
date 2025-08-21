@@ -4,7 +4,8 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=9" />
+  <link rel="stylesheet" href="styles.css?v=10" />
+  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
   <header>
@@ -82,17 +83,53 @@
   </footer>
 
   <script>
-    // ✅ Check if user is logged in
-    const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
-    const userEmail = localStorage.getItem("gmmcoEmail");
+    const msalConfig = {
+      auth: {
+        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
+      }
+    };
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-    if (!isLoggedIn || !userEmail) {
-      // Not logged in → go to login
-      window.location.href = "/ci-dashboard/login.html";
-    } else {
-      console.log("✅ Dashboard loaded for:", userEmail);
-      document.querySelector(".user-profile").title = userEmail;
+    const allowedEmails = [
+      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
+      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
+      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
+      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
+      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
+    ];
+
+    function ensureLoggedIn() {
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        const userEmail = accounts[0].username.toLowerCase();
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          document.querySelector(".user-profile").title = userEmail;
+          console.log("✅ Dashboard loaded for:", userEmail);
+          return;
+        } else {
+          alert("Access denied.");
+          localStorage.clear();
+          msalInstance.logoutPopup();
+          window.location.href = "/ci-dashboard/login.html";
+        }
+      } else {
+        // fallback localStorage check
+        const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
+        const userEmail = localStorage.getItem("gmmcoEmail");
+        if (!isLoggedIn || !userEmail) {
+          window.location.href = "/ci-dashboard/login.html";
+        } else {
+          document.querySelector(".user-profile").title = userEmail;
+        }
+      }
     }
+
+    ensureLoggedIn();
   </script>
 
   <!-- ✅ Month/Year Dropdown Fix -->
@@ -101,18 +138,12 @@
     const yearSelect = document.getElementById("year-select");
 
     const months = [
-      { value: "04", name: "April" },
-      { value: "05", name: "May" },
-      { value: "06", name: "June" },
-      { value: "07", name: "July" },
-      { value: "08", name: "August" },
-      { value: "09", name: "September" },
-      { value: "10", name: "October" },
-      { value: "11", name: "November" },
-      { value: "12", name: "December" },
-      { value: "01", name: "January" },
-      { value: "02", name: "February" },
-      { value: "03", name: "March" }
+      { value: "04", name: "April" },{ value: "05", name: "May" },
+      { value: "06", name: "June" }, { value: "07", name: "July" },
+      { value: "08", name: "August" },{ value: "09", name: "September" },
+      { value: "10", name: "October" },{ value: "11", name: "November" },
+      { value: "12", name: "December" },{ value: "01", name: "January" },
+      { value: "02", name: "February" },{ value: "03", name: "March" }
     ];
 
     function rebuildMonthOptions(financialYear) {
@@ -121,7 +152,6 @@
         const actualYear = parseInt(month.value) < 4 
           ? parseInt(financialYear) + 1 
           : parseInt(financialYear);
-
         const option = document.createElement("option");
         option.value = month.value;
         option.textContent = `${month.name} ${actualYear}`;
@@ -133,21 +163,13 @@
       const today = new Date();
       const thisMonth = today.getMonth() + 1;
       const thisYear = today.getFullYear();
-
-      // Determine FY (April–March)
       const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
 
-      // ✅ Match dropdown FY values
       if (yearSelect.querySelector(`option[value="${fy}"]`)) {
         yearSelect.value = fy.toString();
-      } else {
-        yearSelect.value = "";
       }
-
-      // Build months for that FY
       rebuildMonthOptions(fy);
 
-      // ✅ Preselect current month
       const monthValue = String(thisMonth).padStart(2, "0");
       if (monthSelect.querySelector(`option[value="${monthValue}"]`)) {
         monthSelect.value = monthValue;
