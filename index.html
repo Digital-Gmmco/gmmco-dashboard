@@ -4,77 +4,8 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=4" />
-
-  <!-- MSAL library -->
+  <link rel="stylesheet" href="styles.css?v=5" />
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
-
-  <script>
-    // MSAL config
-    const msalConfig = {
-      auth: {
-        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
-      }
-    };
-    const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-    // Allowed emails
-    const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com",
-      "meenakshi.v@gmmcoindia.com",
-      "priyadharshini.m@gmmcoindia.com",
-      "hpramod@gmmcoindia.com",
-      "rahul.s@gmmcoindia.com",
-      "chandrashekar.v@gmmcoindia.com",
-      "shahid@gmmcoindia.com",
-      "manikandan.g@gmmcoindia.com",
-      "jrajkumar@gmmcoindia.com",
-      "karansingh.r@gmmcoindia.com",
-      "josephmartin@gmmcoindia.com",
-      "sameer.w@gmmcoindia.com",
-      "anshajsingh.a@gmmcoindia.com",
-      "kumaresan.p@gmmcoindia.com",
-      "presely.a@gmmcoindia.com",
-      "user18@gmmco.in",
-      "user19@gmmco.in",
-      "user20@gmmco.in"
-    ];
-
-    // Handle redirect response
-    msalInstance.handleRedirectPromise().then(response => {
-      let account = null;
-
-      if (response && response.account) {
-        account = response.account;
-      } else {
-        const accounts = msalInstance.getAllAccounts();
-        if (accounts.length > 0) {
-          account = accounts[0];
-        }
-      }
-
-      if (account) {
-        const userEmail = account.username.toLowerCase();
-        if (allowedEmails.includes(userEmail)) {
-          localStorage.setItem("gmmcoLoggedIn", "true");
-          localStorage.setItem("gmmcoEmail", userEmail);
-          console.log("✅ Login successful:", userEmail);
-        } else {
-          alert("Access denied: Your account is not authorized.");
-          localStorage.clear();
-          window.location.href = "/ci-dashboard/login.html";
-        }
-      } else {
-        // Not logged in → send back to login
-        window.location.href = "/ci-dashboard/login.html";
-      }
-    }).catch(error => {
-      console.error("Redirect handling error:", error);
-      window.location.href = "/ci-dashboard/login.html";
-    });
-  </script>
 </head>
 <body>
   <header>
@@ -83,6 +14,9 @@
     <div class="user-profile" id="user-profile">
       <img src="images/gmmcocat.png" alt="User Icon" class="logo" />
     </div>
+    <button id="logout-btn" style="margin-left:20px; padding:6px 12px; border:none; border-radius:6px; background:#c62828; color:#fff; cursor:pointer;">
+      Logout
+    </button>
     <hr />
   </header>
 
@@ -113,7 +47,7 @@
       </div>
     </section>
     
-    <p style="margin:10px 0; font-size:14px; font-style:italic; color:#555;text-align:center;">
+    <p style="margin:10px 0; font-size:14px; font-style:italic; color:#555; text-align:center;">
       *Returns are not captured in this dashboard
     </p>
 
@@ -147,9 +81,80 @@
 
   <footer>
     <hr />
-    &copy; 2025 GMMCO CI Sales Dashboard - Live;
+    &copy; 2025 GMMCO CI Sales Dashboard - Live
     <hr />
   </footer>
+
+  <script>
+    const msalConfig = {
+      auth: {
+        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri:"https://mygmmco.gmmco.in/ci-dashboard/index.html"
+      }
+    };
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+    const allowedEmails = [
+      "arunprasad.r@gmmcoindia.com",
+      "meenakshi.v@gmmcoindia.com",
+      "priyadharshini.m@gmmcoindia.com",
+      "hpramod@gmmcoindia.com",
+      "rahul.s@gmmcoindia.com",
+      "chandrashekar.v@gmmcoindia.com",
+      "shahid@gmmcoindia.com",
+      "manikandan.g@gmmcoindia.com",
+      "jrajkumar@gmmcoindia.com",
+      "karansingh.r@gmmcoindia.com",
+      "josephmartin@gmmcoindia.com",
+      "sameer.w@gmmcoindia.com",
+      "anshajsingh.a@gmmcoindia.com",
+      "kumaresan.p@gmmcoindia.com",
+      "presely.a@gmmcoindia.com",
+      "user18@gmmco.in",
+      "user19@gmmco.in",
+      "user20@gmmco.in"
+    ];
+
+    // 🚀 Handle login/redirect
+    msalInstance.handleRedirectPromise().then(response => {
+      let account = null;
+
+      if (response && response.account) {
+        account = response.account;
+      } else {
+        const accounts = msalInstance.getAllAccounts();
+        if (accounts.length > 0) {
+          account = accounts[0];
+        }
+      }
+
+      if (account) {
+        const userEmail = account.username.toLowerCase();
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          console.log("✅ Logged in as:", userEmail);
+        } else {
+          alert("Access denied: Your account is not authorized.");
+          localStorage.clear();
+          window.location.href = "/ci-dashboard/login.html";
+        }
+      } else {
+        // Not logged in → send to login
+        window.location.href = "/ci-dashboard/login.html";
+      }
+    }).catch(error => {
+      console.error("Redirect handling error:", error);
+      window.location.href = "/ci-dashboard/login.html";
+    });
+
+    // 🚪 Logout handler
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.clear();
+      msalInstance.logoutRedirect({ postLogoutRedirectUri: "/ci-dashboard/login.html" });
+    });
+  </script>
 
   <!-- Month & Year dropdown setup logic -->
   <script>
@@ -192,7 +197,7 @@
 
       if (!selectedYear || !selectedMonth) return;
 
-      console.log("Filters applied manually:", {
+      console.log("Filters applied:", {
         year: selectedYear,
         month: selectedMonth,
         group: selectedGroup
@@ -221,7 +226,7 @@
     yearSelect.addEventListener("change", applyFilters);
   </script>
 
-  <!-- Main dashboard logic -->
+  <!-- Dashboard logic -->
   <script src="dashboard.js"></script>
 </body>
 </html>
