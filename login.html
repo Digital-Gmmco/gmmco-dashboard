@@ -122,37 +122,49 @@
       "user19@gmmco.in",
       "user20@gmmco.in"
     ];
+   // Login function
   async function loginWithAzure() {
-      try {
-        // ✅ Use redirect flow instead of popup
-        await msalInstance.loginRedirect({ scopes: ["User.Read"] });
-      } catch (error) {
-        console.error(error);
-        alert("Azure login failed: " + error.message);
-      }
+    try {
+      await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+    } catch (error) {
+      console.error(error);
+      alert("Azure login failed: " + error.message);
     }
+  }
 
-    // ✅ Handle redirect response
-    msalInstance.handleRedirectPromise().then(response => {
-      if (response && response.account) {
-        const userEmail = response.account.username.toLowerCase();
+  // Handle redirect response
+  msalInstance.handleRedirectPromise().then(response => {
+    if (response && response.account) {
+      const userEmail = response.account.username.toLowerCase();
+      if (allowedEmails.includes(userEmail)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", userEmail);
+        window.location.href = "/ci-dashboard/index.html";
+      } else {
+        alert("Access denied: Your account is not authorized.");
+      }
+    } else {
+      // ✅ Already logged in? Skip login page
+      const accounts = msalInstance.getAllAccounts();
+      if (accounts.length > 0) {
+        const userEmail = accounts[0].username.toLowerCase();
         if (allowedEmails.includes(userEmail)) {
           localStorage.setItem("gmmcoLoggedIn", "true");
           localStorage.setItem("gmmcoEmail", userEmail);
           window.location.href = "/ci-dashboard/index.html";
-        } else {
-          alert("Access denied: Your account is not authorized to access this dashboard.");
         }
       }
-    }).catch(error => {
-      console.error("Redirect handling error:", error);
-    });
+    }
+  }).catch(error => {
+    console.error("Redirect handling error:", error);
+  });
   </script>
 </body>
 </html>
 
 
   
+
 
 
 
