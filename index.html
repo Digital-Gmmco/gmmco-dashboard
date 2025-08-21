@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=8" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
   <header>
@@ -101,6 +101,71 @@
     document.getElementById("logout-btn").addEventListener("click", () => {
       localStorage.clear();
       window.location.href = "/ci-dashboard/login.html";
+    });
+  </script>
+
+  <!-- ✅ Month/Year Dropdown Fix -->
+  <script>
+    const monthSelect = document.getElementById("month-select");
+    const yearSelect = document.getElementById("year-select");
+
+    const months = [
+      { value: "04", name: "April" },
+      { value: "05", name: "May" },
+      { value: "06", name: "June" },
+      { value: "07", name: "July" },
+      { value: "08", name: "August" },
+      { value: "09", name: "September" },
+      { value: "10", name: "October" },
+      { value: "11", name: "November" },
+      { value: "12", name: "December" },
+      { value: "01", name: "January" },
+      { value: "02", name: "February" },
+      { value: "03", name: "March" }
+    ];
+
+    function rebuildMonthOptions(financialYear) {
+      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
+      months.forEach((month) => {
+        const actualYear = parseInt(month.value) < 4 
+          ? parseInt(financialYear) + 1 
+          : parseInt(financialYear);
+
+        const option = document.createElement("option");
+        option.value = month.value;
+        option.textContent = `${month.name} ${actualYear}`;
+        monthSelect.appendChild(option);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const today = new Date();
+      const thisMonth = today.getMonth() + 1;
+      const thisYear = today.getFullYear();
+
+      // Determine FY (April–March)
+      const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
+
+      // ✅ Match dropdown FY values
+      if (yearSelect.querySelector(`option[value="${fy}"]`)) {
+        yearSelect.value = fy.toString();
+      } else {
+        yearSelect.value = "";
+      }
+
+      // Build months for that FY
+      rebuildMonthOptions(fy);
+
+      // ✅ Preselect current month
+      const monthValue = String(thisMonth).padStart(2, "0");
+      if (monthSelect.querySelector(`option[value="${monthValue}"]`)) {
+        monthSelect.value = monthValue;
+      }
+    });
+
+    yearSelect.addEventListener("change", () => {
+      const selectedYear = parseInt(yearSelect.value);
+      if (selectedYear) rebuildMonthOptions(selectedYear);
     });
   </script>
 
