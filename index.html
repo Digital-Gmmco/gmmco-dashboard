@@ -4,8 +4,7 @@
   <meta charset="UTF-8" />
   <title>GMMCO Sales Dashboard</title>
   <link rel="icon" type="image/png" href="images/gmmcoG.png" />
-  <link rel="stylesheet" href="styles.css?v=7" />
-  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
+  <link rel="stylesheet" href="styles.css?v=8" />
 </head>
 <body>
   <header>
@@ -86,82 +85,26 @@
   </footer>
 
   <script>
-    // MSAL Config
-    const msalConfig = {
-      auth: {
-        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html"
-      }
-    };
-    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    // ✅ Check if user is logged in
+    const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
+    const userEmail = localStorage.getItem("gmmcoEmail");
 
-    // Allowed users
-    const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com",
-      "meenakshi.v@gmmcoindia.com",
-      "priyadharshini.m@gmmcoindia.com",
-      "hpramod@gmmcoindia.com",
-      "rahul.s@gmmcoindia.com",
-      "chandrashekar.v@gmmcoindia.com",
-      "shahid@gmmcoindia.com",
-      "manikandan.g@gmmcoindia.com",
-      "jrajkumar@gmmcoindia.com",
-      "karansingh.r@gmmcoindia.com",
-      "josephmartin@gmmcoindia.com",
-      "sameer.w@gmmcoindia.com",
-      "anshajsingh.a@gmmcoindia.com",
-      "kumaresan.p@gmmcoindia.com",
-      "presely.a@gmmcoindia.com",
-      "user18@gmmco.in",
-      "user19@gmmco.in",
-      "user20@gmmco.in"
-    ];
+    if (!isLoggedIn || !userEmail) {
+      // Not logged in → go to login
+      window.location.href = "/ci-dashboard/login.html";
+    } else {
+      console.log("✅ Dashboard loaded for:", userEmail);
+      document.querySelector(".user-profile").title = userEmail;
+    }
 
-    // Handle Azure login redirect
-    msalInstance.handleRedirectPromise().then(response => {
-      let account = null;
-
-      if (response && response.account) {
-        account = response.account;
-      } else {
-        const accounts = msalInstance.getAllAccounts();
-        if (accounts.length > 0) {
-          account = accounts[0];
-        }
-      }
-
-      if (account) {
-        const userEmail = account.username.toLowerCase();
-        if (allowedEmails.includes(userEmail)) {
-          localStorage.setItem("gmmcoLoggedIn", "true");
-          localStorage.setItem("gmmcoEmail", userEmail);
-          console.log("✅ Logged in as:", userEmail);
-        } else {
-          alert("Access denied: Your account is not authorized.");
-          localStorage.clear();
-          window.location.href = "/ci-dashboard/login.html";
-        }
-      } else {
-        // ⚠️ Only send back to login if no previous login in storage
-        if (!localStorage.getItem("gmmcoLoggedIn")) {
-          window.location.href = "/ci-dashboard/login.html";
-        }
-      }
-    }).catch(error => {
-      console.error("Redirect handling error:", error);
-      if (!localStorage.getItem("gmmcoLoggedIn")) {
-        window.location.href = "/ci-dashboard/login.html";
-      }
-    });
-
-    // Logout
+    // 🚪 Logout
     document.getElementById("logout-btn").addEventListener("click", () => {
       localStorage.clear();
-      msalInstance.logoutRedirect({ postLogoutRedirectUri: "/ci-dashboard/login.html" });
+      window.location.href = "/ci-dashboard/login.html";
     });
   </script>
 
+  <!-- Dashboard logic -->
   <script src="dashboard.js"></script>
 </body>
 </html>
