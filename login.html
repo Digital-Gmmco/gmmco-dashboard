@@ -122,29 +122,62 @@
       "user19@gmmco.in",
       "user20@gmmco.in"
     ];
-    async function loginWithAzure() {
+  async function loginWithAzure() {
       try {
-        const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-        const userEmail = loginResponse.account.username.toLowerCase();
+        // ✅ Use redirect flow instead of popup
+        await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+      } catch (error) {
+        console.error(error);
+        alert("Azure login failed: " + error.message);
+      }
+    }
+
+    // ✅ Handle redirect response
+    msalInstance.handleRedirectPromise().then(response => {
+      if (response && response.account) {
+        const userEmail = response.account.username.toLowerCase();
         if (allowedEmails.includes(userEmail)) {
           localStorage.setItem("gmmcoLoggedIn", "true");
           localStorage.setItem("gmmcoEmail", userEmail);
           window.location.href = "/ci-dashboard/index.html";
         } else {
           alert("Access denied: Your account is not authorized to access this dashboard.");
-          setTimeout(() => {
-            window.close();
-          }, 5000);
         }
-      } catch (error) {
-        console.error(error);
-        alert("Azure login failed: " + error.message);
       }
-    }
+    }).catch(error => {
+      console.error("Redirect handling error:", error);
+    });
   </script>
 </body>
+</html>
 
-</html> 
+
+
+
+
+
+    
+    //async function loginWithAzure() {
+    //  try {
+    //    const loginResponse = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+    //    const userEmail = loginResponse.account.username.toLowerCase();
+    //    if (allowedEmails.includes(userEmail)) {
+    //      localStorage.setItem("gmmcoLoggedIn", "true");
+    //      localStorage.setItem("gmmcoEmail", userEmail);
+    //      window.location.href = "/ci-dashboard/index.html";
+    //    } else {
+    //      alert("Access denied: Your account is not authorized to access this dashboard.");
+    //      setTimeout(() => {
+    //        window.close();
+    //      }, 5000);
+    //    }
+    //  } catch (error) {
+    //    console.error(error);
+    //    alert("Azure login failed: " + error.message);
+    // }
+    //}
+  
+
 
 
 
