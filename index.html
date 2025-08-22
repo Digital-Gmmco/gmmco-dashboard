@@ -102,24 +102,26 @@
       "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    let isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
     let userEmail = localStorage.getItem("gmmcoEmail");
+    let isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
 
-    // 🔹 If localStorage is missing (mobile case), try MSAL cache
-    if (!isLoggedIn || !userEmail) {
+    // ✅ Check MSAL active account first
+    let account = msalInstance.getActiveAccount();
+    if (!account) {
       const accounts = msalInstance.getAllAccounts();
-      if (accounts.length > 0) {
-        const email = accounts[0].username.toLowerCase();
-        if (allowedEmails.includes(email)) {
-          localStorage.setItem("gmmcoLoggedIn", "true");
-          localStorage.setItem("gmmcoEmail", email);
-          isLoggedIn = true;
-          userEmail = email;
-        }
+      if (accounts.length > 0) account = accounts[0];
+    }
+
+    if ((!isLoggedIn || !userEmail) && account) {
+      const email = account.username.toLowerCase();
+      if (allowedEmails.includes(email)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", email);
+        userEmail = email;
+        isLoggedIn = true;
       }
     }
 
-    // 🔹 If still not logged in → redirect to login page
     if (!isLoggedIn || !userEmail) {
       window.location.href = "/ci-dashboard/login.html";
     } else {
@@ -170,17 +172,14 @@
       // Determine FY (April–March)
       const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
 
-      // ✅ Match dropdown FY values
       if (yearSelect.querySelector(`option[value="${fy}"]`)) {
         yearSelect.value = fy.toString();
       } else {
         yearSelect.value = "";
       }
 
-      // Build months for that FY
       rebuildMonthOptions(fy);
 
-      // ✅ Preselect current month
       const monthValue = String(thisMonth).padStart(2, "0");
       if (monthSelect.querySelector(`option[value="${monthValue}"]`)) {
         monthSelect.value = monthValue;
