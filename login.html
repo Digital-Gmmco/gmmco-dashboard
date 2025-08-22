@@ -118,24 +118,25 @@
       }
     }
 
-    // ✅ Reusable login response handler
     function handleLoginResponse(response) {
-      const account = response?.account || msalInstance.getAllAccounts()[0];
-      if (!account) return;
+  const account = response?.account || msalInstance.getAllAccounts()[0];
+  if (!account) return;
 
-      // 🔑 Set active account so MSAL keeps session
-      msalInstance.setActiveAccount(account);
+  // ✅ Ensure MSAL remembers the account (fixes desktop flow)
+  msalInstance.setActiveAccount(account);
 
-      const userEmail = account.username.toLowerCase();
-      if (allowedEmails.includes(userEmail)) {
-        localStorage.setItem("gmmcoLoggedIn", "true");
-        localStorage.setItem("gmmcoEmail", userEmail);
-        window.location.href = "/ci-dashboard/index.html";
-      } else {
-        alert("Access denied: Your account is not authorized.");
-        localStorage.clear();
-      }
-    }
+  const userEmail = account.username.toLowerCase();
+  if (allowedEmails.includes(userEmail)) {
+    localStorage.setItem("gmmcoLoggedIn", "true");
+    localStorage.setItem("gmmcoEmail", userEmail);
+    // ✅ Force full page reload (fixes dashboard not opening on desktop)
+    window.location.replace("/ci-dashboard/index.html");
+  } else {
+    alert("Access denied: Your account is not authorized.");
+    localStorage.clear();
+  }
+}
   </script>
 </body>
 </html>
+
