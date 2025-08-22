@@ -1,69 +1,123 @@
-<script>
-  const msalConfig = {
-    auth: {
-      clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-      authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-      redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/login.html" // must be registered in Azure
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>GMMCO SSO Login</title>
+  <link rel="icon" type="image/png" href="images/gmmcoG.png">
+  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
+  <style>
+    body {
+      font-family: "Segoe UI", sans-serif;
+      background: url('images/loginpage.png') no-repeat center center fixed;
+      background-size: cover;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      position: relative;
     }
-  };
-  const msalInstance = new msal.PublicClientApplication(msalConfig);
-
-  const allowedEmails = [
-    "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
-    "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
-    "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
-    "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
-    "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
-    "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
-  ];
-
-  function handleLoginResponse(response) {
-    const account = response?.account || msalInstance.getAllAccounts()[0];
-    if (!account) return;
-
-    const userEmail = account.username.toLowerCase();
-    if (allowedEmails.includes(userEmail)) {
-      localStorage.setItem("gmmcoLoggedIn", "true");
-      localStorage.setItem("gmmcoEmail", userEmail);
-      window.location.href = "/ci-dashboard/index.html";
-    } else {
-      alert("Access denied: Your account is not authorized.");
-      localStorage.clear();
+    .logo-top-left, .logo-top-right { position: absolute; top: 20px; }
+    .logo-top-left { left: 20px; }
+    .logo-top-right { right: 20px; }
+    .logo-top-left img, .logo-top-right img { height: 50px; }
+    .login-card {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      width: 340px;
+      backdrop-filter: blur(5px);
     }
-  }
+    .login-card h2 {
+      font-size: 20px;
+      margin-bottom: 20px;
+      color: #222;
+      background-color: #fcd300;
+      padding: 10px;
+      border-radius: 6px;
+    }
+    .sso-button {
+      margin-top: 25px;
+      padding: 12px 20px;
+      background: linear-gradient(to right, #004e92, #000428);
+      border: none;
+      color: white;
+      font-weight: bold;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      width: 100%;
+    }
+    .sso-button:hover {
+      background: linear-gradient(to right, #0058a3, #1a1a60);
+    }
+    .footer { margin-top: 20px; font-size: 12px; color: #555; }
+  </style>
+</head>
+<body>
+  <div class="logo-top-left"><img src="images/gmmco-logo.png" alt="GMMCO Logo"></div>
+  <div class="logo-top-right"><img src="images/gmmcocat.png" alt="GMMCO CAT Logo"></div>
 
-  // ✅ Restore session if already logged in
-  const accounts = msalInstance.getAllAccounts();
-  if (accounts.length > 0) {
-    handleLoginResponse({ account: accounts[0] });
-  }
+  <div class="login-card">
+    <h2>GMMCO CI Dashboard Login</h2>
+    <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
+    <div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
+  </div>
 
-  // ✅ Handle redirect login result (mobile)
-  msalInstance.handleRedirectPromise()
-    .then((response) => {
-      if (response) {
-        handleLoginResponse(response);
+  <script>
+    const msalConfig = {
+      auth: {
+        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // not actually used in popup
       }
-    })
-    .catch((error) => {
-      console.error("Redirect error:", error);
-      document.body.innerHTML += "<p style='color:red;text-align:center;'>⚠️ Login failed. Check console.</p>";
-    });
+    };
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-  // ✅ Login function
-  async function loginWithAzure() {
-    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+    const allowedEmails = [
+      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
+      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
+      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
+      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
+      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
+    ];
 
-    try {
-      if (isMobile) {
-        await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+    // ✅ Auto-restore session if MSAL already has an account
+    const accounts = msalInstance.getAllAccounts();
+    if (accounts.length > 0) {
+      const userEmail = accounts[0].username.toLowerCase();
+      if (allowedEmails.includes(userEmail)) {
+        localStorage.setItem("gmmcoLoggedIn", "true");
+        localStorage.setItem("gmmcoEmail", userEmail);
+        window.location.href = "/ci-dashboard/index.html";
       } else {
-        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-        handleLoginResponse(response);
+        localStorage.clear();
       }
-    } catch (error) {
-      console.error(error);
-      alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
     }
-  }
-</script>
+
+    async function loginWithAzure() {
+      try {
+        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+        const account = response.account;
+        const userEmail = account.username.toLowerCase();
+
+        if (allowedEmails.includes(userEmail)) {
+          localStorage.setItem("gmmcoLoggedIn", "true");
+          localStorage.setItem("gmmcoEmail", userEmail);
+          window.location.href = "/ci-dashboard/index.html";
+        } else {
+          alert("Access denied: Your account is not authorized.");
+          localStorage.clear();
+        }
+      } catch (error) {
+        console.error(error);
+        alert("⚠️ Login failed. Please allow popups in your browser and try again.");
+      }
+    }
+  </script>
+</body>
+</html>
