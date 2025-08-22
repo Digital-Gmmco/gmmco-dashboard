@@ -10,7 +10,7 @@
 <body>
   <header>
     <img src="images/gmmco-logo.png" alt="GMMCO Logo" class="logo" />
-    <div class="title">GMMCO CI Sales Dashboard - Live</div>
+    <div class="title">GMMCO CI Sales Dashboard</div>
     <div class="user-profile" id="user-profile">
       <img src="images/gmmcocat.png" alt="User Icon" class="logo" />
     </div>
@@ -74,8 +74,8 @@
     </table>
 
     <div style="margin-top:15px; font-size:14px; color:#555; text-align:center;">
-    *Returns are not captured in this dashboard<br>
-    *This dashboard refreshes every hour.
+    *Returns are not captured in this dashboard.<br>
+    *This dashboard is auto-refreshed every hour.
     </div>
   </main>
 
@@ -97,12 +97,12 @@
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
     const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+      "arunprasad.r@gmmcoindia.com","vmanikannan@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
       "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
       "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
       "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
       "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
-      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
+      "sambhav.m@gmmcoindia.com","user19@gmmco.in","user20@gmmco.in"
     ];
 
     let userEmail = localStorage.getItem("gmmcoEmail");
@@ -199,4 +199,5 @@
   <script src="dashboard.js"></script>
 </body>
 </html>
+
 
