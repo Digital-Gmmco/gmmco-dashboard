@@ -3,121 +3,165 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>GMMCO SSO Login</title>
-  <link rel="icon" type="image/png" href="images/gmmcoG.png">
-  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
-  <style>
-    body {
-      font-family: "Segoe UI", sans-serif;
-      background: url('images/loginpage.png') no-repeat center center fixed;
-      background-size: cover;
-      height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      position: relative;
-    }
-    .logo-top-left, .logo-top-right { position: absolute; top: 20px; }
-    .logo-top-left { left: 20px; }
-    .logo-top-right { right: 20px; }
-    .logo-top-left img, .logo-top-right img { height: 50px; }
-    .login-card {
-      background: rgba(255, 255, 255, 0.95);
-      padding: 40px 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-      text-align: center;
-      width: 340px;
-      backdrop-filter: blur(5px);
-    }
-    .login-card h2 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      color: #222;
-      background-color: #fcd300;
-      padding: 10px;
-      border-radius: 6px;
-    }
-    .sso-button {
-      margin-top: 25px;
-      padding: 12px 20px;
-      background: linear-gradient(to right, #004e92, #000428);
-      border: none;
-      color: white;
-      font-weight: bold;
-      border-radius: 8px;
-      cursor: pointer;
-      font-size: 14px;
-      width: 100%;
-    }
-    .sso-button:hover {
-      background: linear-gradient(to right, #0058a3, #1a1a60);
-    }
-    .footer { margin-top: 20px; font-size: 12px; color: #555; }
-  </style>
+  <title>GMMCO Sales Dashboard</title>
+  <link rel="icon" type="image/png" href="images/gmmcoG.png" />
+  <link rel="stylesheet" href="styles.css?v=9" />
 </head>
 <body>
-  <div class="logo-top-left"><img src="images/gmmco-logo.png" alt="GMMCO Logo"></div>
-  <div class="logo-top-right"><img src="images/gmmcocat.png" alt="GMMCO CAT Logo"></div>
+  <header>
+    <img src="images/gmmco-logo.png" alt="GMMCO Logo" class="logo" />
+    <div class="title">GMMCO CI Sales Dashboard - Live</div>
+    <div class="user-profile" id="user-profile">
+      <img src="images/gmmcocat.png" alt="User Icon" class="logo" />
+    </div>
+    <hr />
+  </header>
 
-  <div class="login-card">
-    <h2>GMMCO CI Dashboard Login</h2>
-    <button class="sso-button" onclick="loginWithAzure()">Sign in with your email</button>
-    <div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
-  </div>
+  <main>
+    <div class="live-period-container">
+      <div id="billing-period">Loading...</div>
+    </div>
+
+    <section class="filter-container">
+      <div class="filter-right">
+        <label for="month-select">Month:</label>
+        <select id="month-select"></select>
+
+        <label for="year-select">Year:</label>
+        <select id="year-select">
+          <option value="">--Select Year--</option>
+          <option value="2024">FY 2024 - 2025</option>
+          <option value="2025">FY 2025 - 2026</option>
+        </select>
+
+        <label for="group-select">Group:</label>
+        <select id="group-select">
+          <option value="">All</option>
+          <option value="BCP">BCP</option>
+          <option value="GCI">GCI</option>
+          <option value="SEM">SEM</option>
+        </select>
+      </div>
+    </section>
+    
+    <p style="margin:10px 0; font-size:14px; font-style:italic; color:#555; text-align:center;">
+      *Returns are not captured in this dashboard
+    </p>
+
+    <table id="sales-table">
+      <thead>
+        <tr>
+          <th>Product Group</th>
+          <th>Model</th>
+          <th>North</th>
+          <th>South</th>
+          <th>West</th>
+          <th>East</th>
+          <th>Total</th>
+        </tr>
+      </thead>
+      <tbody id="sales-body">
+        <tr><td colspan="7">Loading data...</td></tr>
+      </tbody>
+      <tfoot>
+        <tr class="total-row">
+          <td colspan="2">Total</td>
+          <td id="total-north">0</td>
+          <td id="total-south">0</td>
+          <td id="total-west">0</td>
+          <td id="total-east">0</td>
+          <td id="grand-total">0</td>
+        </tr>
+      </tfoot>
+    </table>
+  </main>
+
+  <footer>
+    <hr />
+    &copy; 2025 GMMCO CI Sales Dashboard - Live
+    <hr />
+  </footer>
 
   <script>
-    const msalConfig = {
-      auth: {
-        clientId:"ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority:"https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/index.html" // not actually used in popup
-      }
-    };
-    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    // ✅ Check if user is logged in
+    const isLoggedIn = localStorage.getItem("gmmcoLoggedIn") === "true";
+    const userEmail = localStorage.getItem("gmmcoEmail");
 
-    const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
-      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
-      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
-      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
-      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
-      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
-    ];
-
-    // ✅ Auto-restore session if MSAL already has an account
-    const accounts = msalInstance.getAllAccounts();
-    if (accounts.length > 0) {
-      const userEmail = accounts[0].username.toLowerCase();
-      if (allowedEmails.includes(userEmail)) {
-        localStorage.setItem("gmmcoLoggedIn", "true");
-        localStorage.setItem("gmmcoEmail", userEmail);
-        window.location.href = "/ci-dashboard/index.html";
-      } else {
-        localStorage.clear();
-      }
-    }
-
-    async function loginWithAzure() {
-      try {
-        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-        const account = response.account;
-        const userEmail = account.username.toLowerCase();
-
-        if (allowedEmails.includes(userEmail)) {
-          localStorage.setItem("gmmcoLoggedIn", "true");
-          localStorage.setItem("gmmcoEmail", userEmail);
-          window.location.href = "/ci-dashboard/index.html";
-        } else {
-          alert("Access denied: Your account is not authorized.");
-          localStorage.clear();
-        }
-      } catch (error) {
-        console.error(error);
-        alert("⚠️ Login failed. Please allow popups in your browser and try again.");
-      }
+    if (!isLoggedIn || !userEmail) {
+      // Not logged in → go to login
+      window.location.href = "/ci-dashboard/login.html";
+    } else {
+      console.log("✅ Dashboard loaded for:", userEmail);
+      document.querySelector(".user-profile").title = userEmail;
     }
   </script>
+
+  <!-- ✅ Month/Year Dropdown Fix -->
+  <script>
+    const monthSelect = document.getElementById("month-select");
+    const yearSelect = document.getElementById("year-select");
+
+    const months = [
+      { value: "04", name: "April" },
+      { value: "05", name: "May" },
+      { value: "06", name: "June" },
+      { value: "07", name: "July" },
+      { value: "08", name: "August" },
+      { value: "09", name: "September" },
+      { value: "10", name: "October" },
+      { value: "11", name: "November" },
+      { value: "12", name: "December" },
+      { value: "01", name: "January" },
+      { value: "02", name: "February" },
+      { value: "03", name: "March" }
+    ];
+
+    function rebuildMonthOptions(financialYear) {
+      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
+      months.forEach((month) => {
+        const actualYear = parseInt(month.value) < 4 
+          ? parseInt(financialYear) + 1 
+          : parseInt(financialYear);
+
+        const option = document.createElement("option");
+        option.value = month.value;
+        option.textContent = `${month.name} ${actualYear}`;
+        monthSelect.appendChild(option);
+      });
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      const today = new Date();
+      const thisMonth = today.getMonth() + 1;
+      const thisYear = today.getFullYear();
+
+      // Determine FY (April–March)
+      const fy = thisMonth >= 4 ? thisYear : thisYear - 1;
+
+      // ✅ Match dropdown FY values
+      if (yearSelect.querySelector(`option[value="${fy}"]`)) {
+        yearSelect.value = fy.toString();
+      } else {
+        yearSelect.value = "";
+      }
+
+      // Build months for that FY
+      rebuildMonthOptions(fy);
+
+      // ✅ Preselect current month
+      const monthValue = String(thisMonth).padStart(2, "0");
+      if (monthSelect.querySelector(`option[value="${monthValue}"]`)) {
+        monthSelect.value = monthValue;
+      }
+    });
+
+    yearSelect.addEventListener("change", () => {
+      const selectedYear = parseInt(yearSelect.value);
+      if (selectedYear) rebuildMonthOptions(selectedYear);
+    });
+  </script>
+
+  <!-- Dashboard logic -->
+  <script src="dashboard.js"></script>
 </body>
 </html>
