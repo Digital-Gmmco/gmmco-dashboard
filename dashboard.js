@@ -122,7 +122,7 @@ function formatBillingPeriod() {
   const isLive = (month === currentMonth && correctedYear.toString() === currentYear);
   const monthName = selectedDate.toLocaleString("default", { month: "long" });
 
-  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}${isLive ? ' (LIVE)' : ''}`;
+  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}${isLive ? ' (CURRENT)' : ''}`;
 
   console.log("📆 Billing period label:", billingText);
   document.getElementById("billing-period").textContent = billingText;
@@ -323,6 +323,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
