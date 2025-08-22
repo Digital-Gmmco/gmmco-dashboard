@@ -122,7 +122,7 @@ function formatBillingPeriod() {
   const isLive = (month === currentMonth && correctedYear.toString() === currentYear);
   const monthName = selectedDate.toLocaleString("default", { month: "long" });
 
-  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}{isLive ? ' (CURRENT)' : ''};
+  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}${isLive ? ' (CURRENT)' : ''}`;
 
   console.log("📆 Billing period label:", billingText);
   document.getElementById("billing-period").textContent = billingText;
@@ -146,7 +146,7 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-let url = "https://mygmmcouat.gmmco.in/api/get-asset-report";
+let url = "https://mygmmco.gmmco.in/api/get-asset-report";
 //let url = "https://uat.gmmco.in/gmmco-api/get-asset-report?v=" + Date.now();
 
 
@@ -323,11 +323,6 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
-
-
-
-
-
 
 
 
