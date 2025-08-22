@@ -3,7 +3,7 @@
     auth: {
       clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
       authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-      redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/login.html" // login.html registered in Azure
+      redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/login.html"
     }
   };
   const msalInstance = new msal.PublicClientApplication(msalConfig);
@@ -17,7 +17,7 @@
     "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
   ];
 
-  // 🔹 Handle login result (popup or redirect)
+  // 🔹 Handle login result
   function handleLoginResponse(response) {
     const account = response?.account || msalInstance.getAllAccounts()[0];
     if (!account) return;
@@ -39,16 +39,19 @@
     handleLoginResponse({ account: accounts[0] });
   }
 
-  // 🔹 Handle redirect login result (for mobile)
-  msalInstance.handleRedirectPromise().then((response) => {
-    if (response) {
-      handleLoginResponse(response);
-    }
-  }).catch((error) => {
-    console.error("Redirect error:", error);
-  });
+  // 🔹 Handle redirect login result
+  msalInstance.handleRedirectPromise()
+    .then((response) => {
+      if (response) {
+        handleLoginResponse(response);
+      }
+    })
+    .catch((error) => {
+      console.error("Redirect error:", error);
+      document.body.innerHTML = "<h3 style='color:red;text-align:center;'>⚠️ Login failed. Check console.</h3>";
+    });
 
-  // 🔹 Login function (popup for desktop, redirect for mobile)
+  // 🔹 Login function
   async function loginWithAzure() {
     const isMobile = /Mobi|Android/i.test(navigator.userAgent);
 
@@ -65,3 +68,4 @@
     }
   }
 </script>
+
