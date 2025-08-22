@@ -117,22 +117,25 @@
         console.error("Redirect error:", error);
       });
 
-    // ✅ Login function: popup on desktop, redirect on mobile
     async function loginWithAzure() {
-      const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
 
-      try {
-        if (isMobile) {
-          await msalInstance.loginRedirect({ scopes: ["User.Read"] });
-        } else {
-          const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-          handleLoginResponse(response);
-        }
-      } catch (error) {
-        console.error(error);
-        alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
-      }
+  try {
+    if (isMobile) {
+      // Mobile → redirect login
+      await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+    } else {
+      // Desktop → always popup login
+      const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+      handleLoginResponse(response);
     }
+  } catch (error) {
+    console.error(error);
+    alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
+  }
+}
+
   </script>
 </body>
 </html>
+
