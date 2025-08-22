@@ -108,10 +108,11 @@
           // Mobile → redirect login
           await msalInstance.loginRedirect({ scopes: ["User.Read"] });
         } else {
-          alert("Desktop");
+         // alert("Desktop");
           // Desktop → popup login
-          const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-          handleLoginResponse(response);
+         // const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+          //handleLoginResponse(response);
+          await msalInstance.loginRedirect({ scopes: ["User.Read"] });
         }
       } catch (error) {
         console.error(error);
@@ -140,5 +141,6 @@
   </script>
 </body>
 </html>
+
 
 
