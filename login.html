@@ -1,237 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>GMMCO SSO Login</title>
-<link rel="icon" type="image/png" href="images/gmmcoG.png" />
- 
-  <!-- MSAL Browser SDK -->
-<!-- Note: Using `defer` ensures this script loads before our inline script runs on DOMContentLoaded -->
-<script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js" defer></script>
- 
-  <style>
-    :root { color-scheme: light; }
-    body {
-      font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
-      background: #0a0a0a url('images/loginpage.png') no-repeat center center fixed;
-      background-size: cover;
-      min-height: 100vh; margin:0;
-      display: grid; place-items: center;
-      position: relative;
+<script>
+  const msalConfig = {
+    auth: {
+      clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
+      authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
+      redirectUri: "https://mygmmco.gmmco.in/ci-dashboard/login.html" // login.html registered in Azure
     }
-    .logo-top-left, .logo-top-right { position: absolute; top: 20px; }
-    .logo-top-left { left: 20px; }
-    .logo-top-right { right: 20px; }
-    .logo-top-left img, .logo-top-right img { height: 50px; }
-    .login-card {
-      background: rgba(255, 255, 255, 0.96);
-      padding: 40px 30px; width: 340px;
-      border-radius: 16px; text-align: center;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.25);
-      backdrop-filter: blur(6px);
-    }
-    .login-card h2 {
-      font-size: 20px; margin: 0 0 18px;
-      color: #222; background: #fcd300; padding: 10px; border-radius: 6px;
-    }
-    .sso-button {
-      margin-top: 22px; padding: 12px 20px; width: 100%;
-      border: 0; border-radius: 8px; cursor: pointer;
-      font-weight: 700; font-size: 14px; color: #fff;
-      background: linear-gradient(90deg,#004e92, #000428);
-    }
-    .sso-button[disabled] { opacity: 0.7; cursor: not-allowed; }
-    .sso-button:hover { filter: brightness(1.05); }
-    .hint { margin-top: 10px; font-size: 12px; color: #555; }
-    .footer { margin-top: 18px; font-size: 12px; color: #555; }
-    .error { margin-top: 12px; color: #a40000; font-size: 13px; }
-</style>
-</head>
-<body>
-<!-- Top corner logos -->
-<div class="logo-top-left"><img src="images/gmmco-logo.png" alt="GMMCO Logo"></div>
-<div class="logo-top-right"><img src="images/gmmcocat.png" alt="GMMCO CAT Logo"></div>
- 
-  <!-- Login card -->
-<div class="login-card" role="form" aria-labelledby="login-title">
-<h2 id="login-title">GMMCO CI Dashboard Login</h2>
-<button id="ssoBtn" class="sso-button" aria-label="Sign in with your email">Sign in with your email</button>
-<div id="error" class="error" role="alert" aria-live="polite" hidden></div>
-<div class="hint">Use your GMMCO email account.</div>
-<div class="footer">&copy; 2025 GMMCO CI Dashboard</div>
-</div>
- 
-  <script defer>
-    // ============================
-    // 1) FRAME BUSTER
-    //    Prevents MSAL from running in a nested context (causes popup/iframe errors).
-    //    If you intentionally embed this page in an iframe, set allowRedirectInIframe=true below.
-    // ============================
-    try {
-      if (window.self !== window.top) {
-        window.top.location = window.location.href;
-      }
-    } catch {}
- 
-    // ============================
-    // 2) CONSTANTS
-    // ============================
-    const APP_HOME  = "/ci-dashboard/index.html";  // Landing page after successful login
-    const LOGIN_URL = "/ci-dashboard/login.html";  // This page (also registered as SPA redirect URI)
- 
-    // Your allow-list of specific users (lowercased for robust match)
-    const allowedEmails = [
-      "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
-      "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
-      "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
-      "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
-      "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
-      "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
-    ].map(e => e.toLowerCase());
- 
-    // Optional domain gate (keeps allow-list strict but lets you expand later easily)
-    const allowedDomains = ["gmmcoindia.com", "gmmco.in"];
- 
-    // ============================
-    // 3) MSAL CONFIG  (REDIRECT FLOW)
-    //    Make sure both LOGIN_URL and APP_HOME are registered as SPA redirect URIs in Azure.
-    //    We stick to redirect (no popups) to avoid nested popup issues entirely.
-    // ============================
-    const msalConfig = {
-      auth: {
-        clientId: "ccefd627-1db6-4e1e-b346-3854e82ea9e5",
-        authority: "https://login.microsoftonline.com/457051ff-d001-4f04-9afa-892af205a547",
-        redirectUri: "https://mygmmco.gmmco.in" + LOGIN_URL, // exact absolute URI registered in Entra
-        navigateToLoginRequestUrl: false                      // return directly to redirectUri, not original URL
-      },
-      cache: {
-        cacheLocation: "localStorage", // Aligns with index.html's session model
-        storeAuthStateInCookie: false  // Enable only if you must support legacy IE
-      },
-      system: {
-        // If you NEVER embed in iframes, set to false for stricter security.
-        // If this page might appear in an iframe (e.g., portal shell), true prevents failures.
-        allowRedirectInIframe: true
-      }
-    };
- 
-    const loginRequest = {
-      scopes: ["User.Read"],      // adjust scopes if you call downstream APIs
-      prompt: "select_account"    // forces account picker when multiple sessions exist
-    };
- 
-    // ============================
-    // 4) HELPERS
-    // ============================
-    const errorEl = document.getElementById("error");
-    const ssoBtn  = document.getElementById("ssoBtn");
- 
-    function showError(msg) {
-      errorEl.textContent = msg || "";
-      errorEl.hidden = !msg;
-    }
- 
-    function clearLocalSession() {
-      try {
-        localStorage.removeItem("gmmcoLoggedIn");
-        localStorage.removeItem("gmmcoEmail");
-      } catch {}
-    }
- 
-    function isEmailAllowed(email) {
-      const e = (email || "").toLowerCase();
-      if (allowedEmails.includes(e)) return true;
-      const domain = e.split("@")[1] || "";
-      return allowedDomains.includes(domain);
-    }
- 
-    function completeLogin(userEmail) {
+  };
+  const msalInstance = new msal.PublicClientApplication(msalConfig);
+
+  const allowedEmails = [
+    "arunprasad.r@gmmcoindia.com","meenakshi.v@gmmcoindia.com","priyadharshini.m@gmmcoindia.com",
+    "hpramod@gmmcoindia.com","rahul.s@gmmcoindia.com","chandrashekar.v@gmmcoindia.com",
+    "shahid@gmmcoindia.com","manikandan.g@gmmcoindia.com","jrajkumar@gmmcoindia.com",
+    "karansingh.r@gmmcoindia.com","josephmartin@gmmcoindia.com","sameer.w@gmmcoindia.com",
+    "anshajsingh.a@gmmcoindia.com","kumaresan.p@gmmcoindia.com","presely.a@gmmcoindia.com",
+    "user18@gmmco.in","user19@gmmco.in","user20@gmmco.in"
+  ];
+
+  // 🔹 Handle login result (popup or redirect)
+  function handleLoginResponse(response) {
+    const account = response?.account || msalInstance.getAllAccounts()[0];
+    if (!account) return;
+
+    const userEmail = account.username.toLowerCase();
+    if (allowedEmails.includes(userEmail)) {
       localStorage.setItem("gmmcoLoggedIn", "true");
-      localStorage.setItem("gmmcoEmail", userEmail.toLowerCase());
-      window.location.href = APP_HOME;
+      localStorage.setItem("gmmcoEmail", userEmail);
+      window.location.href = "/ci-dashboard/index.html";
+    } else {
+      alert("Access denied: Your account is not authorized.");
+      localStorage.clear();
     }
- 
-    // ============================
-    // 5) BOOTSTRAP (REDIRECT RESULT → SILENT → BUTTON)
-    //    Order matters:
-    //    a) handleRedirectPromise() FIRST to process the returning auth response
-    //    b) If result present & authorized, set session and go home
-    //    c) Else, try silent token for existing account (sso)
-    //    d) Else, wait for user to click the button (loginRedirect)
-    // ============================
-    let msalInstance;
- 
-    async function bootstrap() {
-      try {
-        msalInstance = new msal.PublicClientApplication(msalConfig);
-        await msalInstance.initialize?.();
- 
-        // (a) Process redirect result if we just came back from Microsoft
-        const result = await msalInstance.handleRedirectPromise().catch(e => {
-          console.error("handleRedirectPromise error:", e);
-          showError("Sign-in processing failed. Please try again.");
-        });
- 
-        if (result?.account) {
-          const userEmail = (result.account.username || "").toLowerCase();
-          if (isEmailAllowed(userEmail)) {
-            completeLogin(userEmail);
-            return; // done
-          } else {
-            clearLocalSession();
-            showError("Access denied: Your account is not authorized.");
-            return;
-          }
-        }
- 
-        // (b) If we already have accounts in cache, try silent acquisition
-        const accounts = msalInstance.getAllAccounts();
-        if (accounts.length > 0) {
-          const account = accounts[0];
-          try {
-            await msalInstance.acquireTokenSilent({ ...loginRequest, account });
-            const userEmail = (account.username || "").toLowerCase();
-            if (isEmailAllowed(userEmail)) {
-              completeLogin(userEmail);
-              return; // done
-            } else {
-              clearLocalSession();
-              showError("Access denied: Your account is not authorized.");
-            }
-          } catch (silentErr) {
-            // Silent failed → user will click the button
-          }
-        }
-      } catch (initErr) {
-        console.error("MSAL init error:", initErr);
-        showError("Initialization failed. Please refresh the page.");
+  }
+
+  // 🔹 Restore session if already logged in
+  const accounts = msalInstance.getAllAccounts();
+  if (accounts.length > 0) {
+    handleLoginResponse({ account: accounts[0] });
+  }
+
+  // 🔹 Handle redirect login result (for mobile)
+  msalInstance.handleRedirectPromise().then((response) => {
+    if (response) {
+      handleLoginResponse(response);
+    }
+  }).catch((error) => {
+    console.error("Redirect error:", error);
+  });
+
+  // 🔹 Login function (popup for desktop, redirect for mobile)
+  async function loginWithAzure() {
+    const isMobile = /Mobi|Android/i.test(navigator.userAgent);
+
+    try {
+      if (isMobile) {
+        await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+      } else {
+        const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+        handleLoginResponse(response);
       }
+    } catch (error) {
+      console.error(error);
+      alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
     }
- 
-    // ============================
-    // 6) INTERACTIVE LOGIN (REDIRECT ONLY)
-    //    No loginPopup() anywhere = no nested popup errors.
-    // ============================
-    async function loginWithAzure() {
-      ssoBtn.disabled = true; showError("");
-      try {
-        await msalInstance.loginRedirect(loginRequest);
-        // Browser navigates to Microsoft. On return, (a) above handles the result.
-      } catch (err) {
-        console.error("loginRedirect error:", err);
-        ssoBtn.disabled = false;
-        showError("Sign-in failed. Please try again.");
-      }
-    }
- 
-    // ============================
-    // 7) WIRE UP
-    // ============================
-    document.addEventListener("DOMContentLoaded", () => {
-      bootstrap();
-      ssoBtn.addEventListener("click", loginWithAzure);
-    });
+  }
 </script>
-</body>
-</html>
