@@ -85,53 +85,57 @@
       "sambhav.m@gmmcoindia.com","user19@gmmco.in","user20@gmmco.in"
     ];
 
-    function handleLoginResponse(response) {
-      const account = response?.account || msalInstance.getAllAccounts()[0];
-      if (!account) return;
+    // ✅ Handle redirect result (mobile flow)
+    msalInstance.handleRedirectPromise()
+      .then(response => {
+        if (response) handleLoginResponse(response);
+      })
+      .catch(error => {
+        console.error("Redirect error:", error);
+      });
 
-      msalInstance.setActiveAccount(account); // ✅ mark active account
-      const userEmail = account.username.toLowerCase();
-
-      if (allowedEmails.includes(userEmail)) {
-        localStorage.setItem("gmmcoLoggedIn", "true");
-        localStorage.setItem("gmmcoEmail", userEmail);
-        window.location.href = "/ci-dashboard/index.html";
-      } else {
-        alert("Access denied: Your account is not authorized.");
-        localStorage.clear();
-      }
-    }
-
-    // ✅ Auto restore if already logged in
+    // ✅ Auto-restore session if already signed in
     const accounts = msalInstance.getAllAccounts();
     if (accounts.length > 0) {
       handleLoginResponse({ account: accounts[0] });
     }
 
-    // ✅ Handle redirect result (mobile flow)
-    msalInstance.handleRedirectPromise()
-      .then((response) => {
-        if (response) handleLoginResponse(response);
-      })
-      .catch((error) => {
-        console.error("Redirect error:", error);
-      });
-
+    // Login function
     async function loginWithAzure() {
-  const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
-
-  try {
-    if (isMobile) {
-      // Mobile → redirect login
-      await msalInstance.loginRedirect({ scopes: ["User.Read"] });
-    } else {
-      // Desktop → always popup login
-      const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
-      handleLoginResponse(response);
+      const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+      try {
+        if (isMobile) {
+          // Mobile → redirect login
+          await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+        } else {
+         // alert("Desktop");
+          // Desktop → popup login
+         // const response = await msalInstance.loginPopup({ scopes: ["User.Read"] });
+          //handleLoginResponse(response);
+          await msalInstance.loginRedirect({ scopes: ["User.Read"] });
+        }
+      } catch (error) {
+        console.error(error);
+        alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
+      }
     }
-  } catch (error) {
-    console.error(error);
-    alert("⚠️ Login failed. Please allow popups/redirects in your browser and try again.");
+
+    function handleLoginResponse(response) {
+  const account = response?.account || msalInstance.getAllAccounts()[0];
+  if (!account) return;
+
+  // ✅ Ensure MSAL remembers the account (fixes desktop flow)
+  msalInstance.setActiveAccount(account);
+
+  const userEmail = account.username.toLowerCase();
+  if (allowedEmails.includes(userEmail)) {
+    localStorage.setItem("gmmcoLoggedIn", "true");
+    localStorage.setItem("gmmcoEmail", userEmail);
+    // ✅ Force full page reload (fixes dashboard not opening on desktop)
+    window.location.replace("/ci-dashboard/index.html");
+  } else {
+    alert("Access denied: Your account is not authorized.");
+    localStorage.clear();
   }
 }
 
@@ -139,6 +143,7 @@
   </script>
 </body>
 </html>
+
 
 
 
