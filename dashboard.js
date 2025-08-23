@@ -122,7 +122,7 @@ function formatBillingPeriod() {
   const isLive = (month === currentMonth && correctedYear.toString() === currentYear);
   const monthName = selectedDate.toLocaleString("default", { month: "long" });
 
-  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}`;
+  const billingText = `BILLING PERIOD: ${monthName.toUpperCase()} ${correctedYear}${isLive ? ' (CURRENT)' : ''}`;
 
   console.log("📆 Billing period label:", billingText);
   document.getElementById("billing-period").textContent = billingText;
