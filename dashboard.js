@@ -146,7 +146,7 @@ function applyFilters() {
   const year = document.getElementById("year-select").value;
   const group = document.getElementById("group-select").value;
 
-let url = "https://uat.gmmco.in/api/get-asset-report";
+let url = "https://mygmmco.gmmco.in/api/get-asset-report";
 //let url = "https://uat.gmmco.in/gmmco-api/get-asset-report?v=" + Date.now();
 
 
@@ -323,6 +323,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
