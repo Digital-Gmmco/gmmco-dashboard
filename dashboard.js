@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   formatBillingPeriod();
   applyFilters();
-  setInterval(applyFilters, 3*6*100);
+  setInterval(applyFilters, 30 * 60 * 1000); // 30 min = 1,800,000 ms
 
   ["month-select", "year-select", "group-select"].forEach(id => {
     document.getElementById(id).addEventListener("change", applyFilters);
@@ -254,43 +254,12 @@ function processAndRenderData(data) {
 }
 
 function renderTable(dataMap) {
- /*
-  let totalN=0,totalS=0,totalW=0,totalE=0;
-  let html = "";
-
-  for (const data of Object.values(dataMap)) {
-    const total = data.North + data.South + data.West + data.East;
-    totalN += data.North; totalS += data.South; totalW += data.West; totalE += data.East;
-
-    // Prefer a single, safe placeholder image (avoid 404s):
-    const imgTag = `<img src="images/placeholder.png" loading="lazy" decoding="async" width="40" height="40" alt="">`;
-
-    html += `
-      <tr>
-        <td>${data.group}</td>
-        <td>${imgTag} ${data.fullModel.includes(data.modelNumber) ? data.fullModel : `<strong>${data.modelNumber}</strong> - ${data.fullModel}`}</td>
-        <td>${data.North}</td>
-        <td>${data.South}</td>
-        <td>${data.West}</td>
-        <td>${data.East}</td>
-        <td>${total}</td>
-      </tr>`;
-  }
-
-  document.getElementById("sales-body").innerHTML = html;
-  document.getElementById("total-north").textContent = totalN;
-  document.getElementById("total-south").textContent = totalS;
-  document.getElementById("total-west").textContent  = totalW;
-  document.getElementById("total-east").textContent  = totalE;
-  document.getElementById("grand-total").textContent = totalN+totalS+totalW+totalE;
-*/
-  
   const tbody = document.getElementById("sales-body");
- tbody.innerHTML = "";
+  tbody.innerHTML = "";
 
-let totalNorth = 0, totalSouth = 0, totalWest = 0, totalEast = 0;
+  let totalNorth = 0, totalSouth = 0, totalWest = 0, totalEast = 0;
 
-Object.values(dataMap).forEach(data => {
+  Object.values(dataMap).forEach(data => {
     const total = data.North + data.South + data.West + data.East;
     totalNorth += data.North;
     totalSouth += data.South;
@@ -326,9 +295,7 @@ Object.values(dataMap).forEach(data => {
   document.getElementById("total-south").textContent = totalSouth;
   document.getElementById("total-west").textContent = totalWest;
   document.getElementById("total-east").textContent = totalEast;
-  document.getElementById("grand-total").textContent = totalNorth + totalSouth + totalWest + totalEast; 
-  
-
+  document.getElementById("grand-total").textContent = totalNorth + totalSouth + totalWest + totalEast;
 }
 
 function toggleDetails(modelNumber, region) {
@@ -356,11 +323,6 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
-
-
-
-
-
 
 
 
