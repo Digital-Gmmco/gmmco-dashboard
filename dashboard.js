@@ -83,7 +83,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   formatBillingPeriod();
   applyFilters();
-  setInterval(applyFilters, 10000);
+  setInterval(applyFilters, 3*6*1000);
 
   ["month-select", "year-select", "group-select"].forEach(id => {
     document.getElementById(id).addEventListener("change", applyFilters);
@@ -323,6 +323,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
