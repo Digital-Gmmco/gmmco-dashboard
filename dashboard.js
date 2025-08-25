@@ -254,6 +254,7 @@ function processAndRenderData(data) {
 }
 
 function renderTable(dataMap) {
+ /*
   let totalN=0,totalS=0,totalW=0,totalE=0;
   let html = "";
 
@@ -282,8 +283,8 @@ function renderTable(dataMap) {
   document.getElementById("total-west").textContent  = totalW;
   document.getElementById("total-east").textContent  = totalE;
   document.getElementById("grand-total").textContent = totalN+totalS+totalW+totalE;
-
-/*<!--  
+*/
+  
   const tbody = document.getElementById("sales-body");
  tbody.innerHTML = "";
 
@@ -326,7 +327,7 @@ Object.values(dataMap).forEach(data => {
   document.getElementById("total-west").textContent = totalWest;
   document.getElementById("total-east").textContent = totalEast;
   document.getElementById("grand-total").textContent = totalNorth + totalSouth + totalWest + totalEast; 
-  --> */
+  
 
 }
 
@@ -355,6 +356,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
