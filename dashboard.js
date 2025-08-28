@@ -221,11 +221,9 @@ function processAndRenderData(data) {
     ) return;
 
     const imageKey = matchedProduct ? matchedProduct.model : modelNumber;
-    let sbu = item.SBU?.trim();
-    if (!sbu) {
-      const prefix = item.Plant_Code?.substring(0, 2).toUpperCase();
-      sbu = sbuMapping[prefix] || "Unknown";
-    }
+    let prefix = item.Plant_Code?.substring(0, 2).toUpperCase();
+    let sbu = sbuMapping[prefix] || item.SBU?.trim() || "Unknown";
+
 
     // Build data
     if (!modelData[modelNumber]) {
@@ -323,6 +321,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
