@@ -67,7 +67,7 @@ const skipKeywords = [
 ];
 
 const sbuMapping = {
-  AP: "East", CG: "East", TS: "East",
+  AP: "East", CG: "North", TS: "East",
   DL: "North", MP: "North",
   KA: "South", KL: "South", TN: "South",
   GA: "West", GJ: "West", MH: "West"
@@ -323,6 +323,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
