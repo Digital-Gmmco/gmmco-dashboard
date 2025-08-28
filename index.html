@@ -164,9 +164,14 @@
   </script>
 
   <!-- Dashboard logic -->
-  <script src="dashboard.js"></script>
+   <script>
+  const script = document.createElement("script");
+  script.src = "dashboard.js?v=" + new Date().getTime(); // unique timestamp
+  document.head.appendChild(script);
+   <script>
 </body>
 </html>
+
 
 
 
