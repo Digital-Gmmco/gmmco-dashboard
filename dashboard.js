@@ -194,7 +194,16 @@ function processAndRenderData(data) {
     const { month: purchasedMonth, year: purchasedYear } =
       extractISTDateParts(purchasedStr);
   
-    return purchasedMonth === month && purchasedYear === year;
+    // Build selected calendar month range
+    const selectedStart = new Date(`${year}-${month}-01`);
+    selectedStart.setHours(0, 0, 0, 0);
+    
+    const selectedEnd = new Date(selectedStart);
+    selectedEnd.setMonth(selectedEnd.getMonth() + 1);
+    
+    // Keep only records within the selected month range
+    return purchasedDate >= selectedStart && purchasedDate < selectedEnd;
+
   });
 
 
@@ -335,6 +344,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
