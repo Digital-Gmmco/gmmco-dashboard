@@ -194,8 +194,12 @@ function processAndRenderData(data) {
     const { month: purchasedMonth, year: purchasedYear } =
       extractISTDateParts(purchasedStr);
   
+    // ✅ Convert FY year → actual calendar year
+    let correctedYear = parseInt(year);
+    if (parseInt(month) < 4) correctedYear += 1;
+    
     // Build selected calendar month range
-    const selectedStart = new Date(`${year}-${month}-01`);
+    const selectedStart = new Date(`${correctedYear}-${month}-01`);
     selectedStart.setHours(0, 0, 0, 0);
     
     const selectedEnd = new Date(selectedStart);
@@ -203,6 +207,7 @@ function processAndRenderData(data) {
     
     // Keep only records within the selected month range
     return purchasedDate >= selectedStart && purchasedDate < selectedEnd;
+
 
   });
 
@@ -344,6 +349,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
