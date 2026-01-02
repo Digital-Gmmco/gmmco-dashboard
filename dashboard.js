@@ -177,13 +177,26 @@ function processAndRenderData(data) {
   const year = document.getElementById("year-select").value;
   const selectedGroup = document.getElementById("group-select").value;
 
-  // Filter by month/year
+  // Filter by month/year AND block future dates
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
   const filteredData = data.filter(item => {
     const purchasedStr = item["Date Purchased"];
     if (!purchasedStr) return false;
-    const { month: purchasedMonth, year: purchasedYear } = extractISTDateParts(purchasedStr);
+  
+    const purchasedDate = new Date(purchasedStr);
+    purchasedDate.setHours(0, 0, 0, 0);
+  
+    // 🚫 BLOCK future records
+    if (purchasedDate > today) return false;
+  
+    const { month: purchasedMonth, year: purchasedYear } =
+      extractISTDateParts(purchasedStr);
+  
     return purchasedMonth === month && purchasedYear === year;
   });
+
 
   // Filter by allowed divisions
   const allowedDivisions = ["02", "03", "04", "07"];
@@ -322,6 +335,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
