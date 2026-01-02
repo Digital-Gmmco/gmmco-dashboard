@@ -142,19 +142,30 @@
       { value: "03", name: "March" }
     ];
 
-    function rebuildMonthOptions(financialYear) {
-      monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
-      months.forEach((month) => {
-        const actualYear = parseInt(month.value) < 4 
-          ? parseInt(financialYear) + 1 
-          : parseInt(financialYear);
+function rebuildMonthOptions(financialYear) {
+  monthSelect.innerHTML = `<option value="">--Select Month--</option>`;
 
-        const option = document.createElement("option");
-        option.value = month.value;
-        option.textContent = `${month.name} ${actualYear}`;
-        monthSelect.appendChild(option);
-      });
-    }
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  months.forEach(month => {
+    const actualYear =
+      parseInt(month.value) < 4
+        ? parseInt(financialYear) + 1
+        : parseInt(financialYear);
+
+    const optionDate = new Date(`${actualYear}-${month.value}-01`);
+    optionDate.setHours(0, 0, 0, 0);
+
+    if (optionDate > today) return; // 🚫 hide future months
+
+    const option = document.createElement("option");
+    option.value = month.value;
+    option.textContent = `${month.name} ${actualYear}`;
+    monthSelect.appendChild(option);
+  });
+}
+
 
     window.addEventListener("DOMContentLoaded", () => {
       const today = new Date();
@@ -191,6 +202,7 @@
   <script src="dashboard.js?v=10"></script>
 </body>
 </html>
+
 
 
 
