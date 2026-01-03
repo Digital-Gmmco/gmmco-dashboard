@@ -148,6 +148,9 @@ function rebuildMonthOptions(financialYear) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
 
+  const currentFY =
+    today.getMonth() >= 3 ? today.getFullYear() : today.getFullYear() - 1;
+
   months.forEach(month => {
     const actualYear =
       parseInt(month.value) < 4
@@ -157,7 +160,13 @@ function rebuildMonthOptions(financialYear) {
     const optionDate = new Date(`${actualYear}-${month.value}-01`);
     optionDate.setHours(0, 0, 0, 0);
 
-    if (optionDate > today) return; // 🚫 hide future months
+    // 🚫 Hide future months ONLY for current FY
+    if (
+      parseInt(financialYear) === currentFY &&
+      optionDate > today
+    ) {
+      return;
+    }
 
     const option = document.createElement("option");
     option.value = month.value;
@@ -165,6 +174,7 @@ function rebuildMonthOptions(financialYear) {
     monthSelect.appendChild(option);
   });
 }
+
 
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -202,6 +212,7 @@ function rebuildMonthOptions(financialYear) {
   <script src="dashboard.js?v=10"></script>
 </body>
 </html>
+
 
 
 
