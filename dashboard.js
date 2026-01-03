@@ -152,8 +152,15 @@ let url = "https://mygmmco.gmmco.in/api/get-asset-report";
 
 
   const params = new URLSearchParams();
+
   if (month) params.append("month", month);
-  if (year) params.append("year", year);
+  if (year) {
+    let apiYear = parseInt(year);
+    if (parseInt(month) < 4) apiYear += 1; // Jan–Mar → next calendar year
+    params.append("year", apiYear.toString());
+  }
+
+  
   if (group) params.append("group", group);
 
   if (params.toString()) url += `?${params.toString()}`;
@@ -188,8 +195,7 @@ function processAndRenderData(data) {
     const purchasedDate = new Date(purchasedStr);
     purchasedDate.setHours(0, 0, 0, 0);
   
-    // 🚫 BLOCK future records
-    if (purchasedDate > today) return false;
+   
   
     const { month: purchasedMonth, year: purchasedYear } =
       extractISTDateParts(purchasedStr);
@@ -349,6 +355,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
