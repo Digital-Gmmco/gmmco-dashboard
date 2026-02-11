@@ -55,7 +55,8 @@ const products = [
   { model: "324doem", group: "GCI" }, { model: "324d", group: "GCI" },
   { model: "973c", group: "GCI" }, { model: "973d", group: "GCI" },
   { model: "120ng", group: "GCI" }, { model: "992k", group: "GCI" },
-  { model: "917F", group: "SEM" }
+  { model: "917F", group: "SEM" }, { model: "321", group: "GCI" },
+  { model: "322", group: "GCI" }, { model: "324", group: "GCI" }
 ];
 
 const skipKeywords = [
@@ -355,6 +356,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
