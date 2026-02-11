@@ -1,8 +1,10 @@
 const products = [
-  { model: "424", group: "BCP" }, { model: "320", group: "GCI" },
-  { model: "323", group: "GCI" }, { model: "656", group: "SEM" },
-  { model: "2021", group: "BCP" }, { model: "313", group: "GCI" },
-  { model: "316", group: "GCI" }, { model: "120", group: "GCI" },
+  { model: "321", group: "GCI" }, { model: "322", group: "GCI" }, 
+  { model: "324", group: "GCI" }, { model: "424", group: "BCP" }, 
+  { model: "320", group: "GCI" }, { model: "323", group: "GCI" }, 
+  { model: "656", group: "SEM" }, { model: "2021", group: "BCP" }, 
+  { model: "313", group: "GCI" }, { model: "316", group: "GCI" }, 
+  { model: "120", group: "GCI" },
   { model: "140", group: "GCI" }, { model: "216", group: "BCP" },
   { model: "330", group: "GCI" }, { model: "335", group: "GCI" },
   { model: "636", group: "SEM" }, { model: "816", group: "SEM" },
@@ -55,8 +57,7 @@ const products = [
   { model: "324doem", group: "GCI" }, { model: "324d", group: "GCI" },
   { model: "973c", group: "GCI" }, { model: "973d", group: "GCI" },
   { model: "120ng", group: "GCI" }, { model: "992k", group: "GCI" },
-  { model: "917F", group: "SEM" }, { model: "321", group: "GCI" },
-  { model: "322", group: "GCI" }, { model: "324", group: "GCI" }
+  { model: "917F", group: "SEM" }
 ];
 
 const skipKeywords = [
@@ -356,6 +357,7 @@ function toggleDetails(modelNumber, region) {
       }).join("<br>");
   row.style.display = "table-row";
 }
+
 
 
 
